@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Notebook</string>
+    <string name="add_notebook_button_description">Add a new notebook</string>
+    <string name="no_notebooks">There is no notebook created yet. Try creating one!</string>
+</resources>
