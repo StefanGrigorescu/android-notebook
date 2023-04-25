@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.notebook.models.Notebook
 import com.example.notebook.ui.theme.NotebookTheme
@@ -42,20 +41,32 @@ class MainActivity : ComponentActivity() {
     private fun getNotebooks(): List<Notebook> {
         // TODO: Implement a method to retrieve the list of notebooks
         // from a data source such as a database or a web service.
-        return emptyList()
+
+        val notebooks = mutableListOf<Notebook>()
+
+        for (i in 1..2500) {
+            val notebook = Notebook()
+            notebook.title = "Notebook $i"
+            notebook.description = "This is notebook number $i"
+            notebooks.add(notebook)
+        }
+
+        return notebooks
+
+        // return emptyList()
     }
 }
 
 @Composable
 fun NotebookList(notebooks: List<Notebook>) {
-    val notebooks by remember { mutableStateOf(notebooks) }
+    val notebooksState by remember { mutableStateOf(notebooks) }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(id = R.string.app_name)) }) },
         floatingActionButton = { AddNotebookButton() },
         floatingActionButtonPosition = FabPosition.End,
         content = {
-            NotebookListView(notebooks, it)
+            NotebookListView(notebooksState, it)
         }
     )
 }

@@ -8,10 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="primary_default">#ded6a0</color>
-    <color name="primary_light">#faf2eb</color>
-    <color name="primary_dark">#f9c31f</color>
-    <color name="secondary_default">#6cc5e0</color>
-    <color name="secondary_light">#def2f8</color>
-    <color name="secondary_dark">#165669</color>
+    <color name="sand_default">#ded6a0</color>
+    <color name="sand_light">#faf2eb</color>
+    <color name="sand_dark">#f9c31f</color>
+    <color name="sea_default">#6cc5e0</color>
+    <color name="sea_light">#def2f8</color>
+    <color name="sea_dark">#165669</color>
 </resources>
