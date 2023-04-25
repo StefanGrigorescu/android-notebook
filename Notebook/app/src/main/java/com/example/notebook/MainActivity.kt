@@ -10,10 +10,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -21,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.notebook.models.Notebook
 import com.example.notebook.ui.theme.NotebookTheme
+import java.util.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,16 +58,60 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun NotebookList(notebooks: List<Notebook>) {
-    val notebooksState by remember { mutableStateOf(notebooks) }
+    val (filteredNotebooks, setFilteredNotebooks) = remember { mutableStateOf(notebooks) }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(id = R.string.app_name)) }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(id = R.string.app_name)) },
+                backgroundColor = MaterialTheme.colors.primary,
+                elevation = 0.dp
+            )
+        },
         floatingActionButton = { AddNotebookButton() },
         floatingActionButtonPosition = FabPosition.End,
         content = {
-            NotebookListView(notebooksState, it)
+            Column(modifier = Modifier.fillMaxSize()) {
+                NotebookSearchView(notebooks, onSearch = setFilteredNotebooks)
+                NotebookListView(filteredNotebooks, it)
+            }
         }
     )
+}
+
+@Composable
+fun NotebookSearchView(
+    notebooks: List<Notebook>,
+    onSearch: (List<Notebook>) -> Unit
+) {
+    var searchText by remember { mutableStateOf("") }
+
+    TextField(
+        value = searchText,
+        onValueChange = { newSearchText ->
+            searchText = newSearchText
+            onSearch(getFilteredNotebooks(notebooks, newSearchText))
+        },
+        label = { Text(stringResource(id = R.string.search_notebooks_hint)) },
+        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+private fun getFilteredNotebooks(
+    notebooks: List<Notebook>,
+    searchText: String
+): List<Notebook> {
+    if (searchText.isBlank()) {
+        return notebooks
+    }
+
+    val searchTerm = searchText.lowercase(Locale.getDefault())
+
+    return notebooks.filter { notebook ->
+        notebook.title.lowercase(Locale.getDefault()).contains(searchTerm) ||
+                notebook.description.lowercase(Locale.getDefault()).contains(searchTerm)
+    }
 }
 
 @Composable

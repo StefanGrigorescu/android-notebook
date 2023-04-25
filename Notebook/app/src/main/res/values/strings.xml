@@ -2,4 +2,8 @@
     <string name="app_name">Notebook</string>
     <string name="add_notebook_button_description">Add a new notebook</string>
     <string name="no_notebooks">There is no notebook created yet. Try creating one!</string>
+    <string name="search_notebooks_hint">Search notebook by name or by description</string>
+
+    <string name="graph_main_activity_label">MainActivity</string>
+    <string name="graph_create_notebook_activity_label">CreateNotebookActivity</string>
 </resources>
