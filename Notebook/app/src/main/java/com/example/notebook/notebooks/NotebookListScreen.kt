@@ -17,13 +17,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.notebook.AppBrand
-import com.example.notebook.models.Notebook
 import com.example.notebook.navigation.BottomBar
 import com.example.notebook.navigation.Screen
 import java.util.*
 
 @Composable
-fun NotebookList(navController: NavHostController) {
+fun NotebookListScreen(navController: NavHostController) {
     val notebooks: List<Notebook> = getNotebooks()
     val (filteredNotebooks, setFilteredNotebooks) = remember { mutableStateOf(notebooks) }
 

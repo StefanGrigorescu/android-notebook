@@ -19,7 +19,7 @@ import com.example.notebook.navigation.BottomBar
 import com.example.notebook.navigation.Screen
 
 @Composable
-fun CreateNotebook(navController: NavHostController) {
+fun CreateNotebookScreen(navController: NavHostController) {
     var notebookName by rememberSaveable("notebookName") { mutableStateOf("") }
     var notebookDescription by rememberSaveable("notebookDescription") { mutableStateOf("") }
     var notebookPassword by rememberSaveable("notebookPassword") { mutableStateOf("") }
@@ -35,10 +35,12 @@ fun CreateNotebook(navController: NavHostController) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .padding(PaddingValues(
-                        start = 20.dp,
-                        end = 20.dp,
-                    )),
+                    .padding(
+                        PaddingValues(
+                            start = 20.dp,
+                            end = 20.dp,
+                        )
+                    ),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 NotebookNameInput(notebookName, onNotebookNameChange = { notebookName = it })
@@ -62,7 +64,7 @@ fun CreateNotebook(navController: NavHostController) {
                 ) {
                     Button(
                         onClick = {
-                            // TODO: Save notebook to database
+                            onSaveNotebook(notebookName, notebookDescription, notebookPassword)
                             navController.popBackStack()
                         },
                         modifier = Modifier.weight(1f)
