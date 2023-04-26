@@ -16,6 +16,6 @@ fun SetupNavGraph(
         startDestination = Screen.NotebookList.route
     ) {
         composable(Screen.NotebookList.route) { NotebookList(navController = navController) }
-        composable(Screen.CreateNotebook.route) { CreateNotebook() }
+        composable(Screen.CreateNotebook.route) { CreateNotebook(navController = navController) }
     }
 }

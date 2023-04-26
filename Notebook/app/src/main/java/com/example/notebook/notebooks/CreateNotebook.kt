@@ -12,10 +12,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.notebook.ui.theme.NotebookTheme
 
 @Composable
-fun CreateNotebook() {
+fun CreateNotebook(navController: NavController) {
     var notebookName by rememberSaveable("notebookName") { mutableStateOf("") }
     var notebookDescription by rememberSaveable("notebookDescription") { mutableStateOf("") }
     var notebookPassword by rememberSaveable("notebookPassword") { mutableStateOf("") }
@@ -74,7 +75,8 @@ fun CreateNotebook() {
             ) {
                 Button(
                     onClick = {
-                        // TODO: Save notebook to database and navigate back to main activity
+                        // TODO: Save notebook to database
+                              navController.popBackStack()
                     },
                     modifier = Modifier.weight(1f)
                 ) {
@@ -95,7 +97,7 @@ fun CreateNotebook() {
 
                 Button(
                     onClick = {
-                        // TODO: Navigate back to main activity
+                        navController.popBackStack()
                     },
                     modifier = Modifier.weight(1f)
                 ) {
