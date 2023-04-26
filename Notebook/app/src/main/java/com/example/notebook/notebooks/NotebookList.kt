@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.notebook.AppBrand
 import com.example.notebook.models.Notebook
 import com.example.notebook.navigation.Screen
 import java.util.*
@@ -27,11 +28,7 @@ fun NotebookList(navController: NavController) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(id = R.string.app_name)) },
-                backgroundColor = MaterialTheme.colors.primary,
-                elevation = 0.dp
-            )
+            AppBrand()
         },
         floatingActionButton = { AddNotebookButton(navController) },
         floatingActionButtonPosition = FabPosition.End,

@@ -5,7 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.notebook.navigation.SetupNavGraph
@@ -30,4 +33,13 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+@Composable
+fun AppBrand() {
+    TopAppBar(
+        title = { Text(stringResource(id = R.string.app_name)) },
+        backgroundColor = MaterialTheme.colors.primary,
+        elevation = 0.dp
+    )
 }

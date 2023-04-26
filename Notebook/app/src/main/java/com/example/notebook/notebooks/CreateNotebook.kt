@@ -3,6 +3,7 @@ package com.example.notebook.notebooks
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -13,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.notebook.ui.theme.NotebookTheme
+import com.example.notebook.AppBrand
 
 @Composable
 fun CreateNotebook(navController: NavController) {
@@ -22,88 +23,119 @@ fun CreateNotebook(navController: NavController) {
     var notebookPassword by rememberSaveable("notebookPassword") { mutableStateOf("") }
     var notebookPasswordConfirm by rememberSaveable("notebookPasswordConfirm") { mutableStateOf("") }
 
-    NotebookTheme {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Notebook name input
-            OutlinedTextField(
-                value = notebookName,
-                onValueChange = { notebookName = it },
-                label = { Text("Notebook Name") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Notebook description input
-            OutlinedTextField(
-                value = notebookDescription,
-                onValueChange = { notebookDescription = it },
-                label = { Text("Notebook Description") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Notebook password input
-            OutlinedTextField(
-                value = notebookPassword,
-                onValueChange = { notebookPassword = it },
-                label = { Text("Notebook Password (Optional)") },
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Notebook password confirmation input
-            if (notebookPassword.isNotBlank()) {
-                OutlinedTextField(
-                    value = notebookPasswordConfirm,
-                    onValueChange = { notebookPasswordConfirm = it },
-                    label = { Text("Confirm Password") },
-                    singleLine = true,
-                    visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-            // Submit, Clear, and Cancel buttons
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
+    Scaffold(
+        topBar = {
+            AppBrand()
+        },
+        content = { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(PaddingValues(
+                        start = 20.dp,
+                        end = 20.dp,
+                    )),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Button(
-                    onClick = {
-                        // TODO: Save notebook to database
-                              navController.popBackStack()
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Submit")
+                NotebookNameInput(notebookName, onNotebookNameChange = { notebookName = it })
+                NotebookDescriptionInput(
+                    notebookDescription,
+                    onNotebookDescriptionChange = { notebookDescription = it })
+                NotebookPasswordInput(
+                    notebookPassword,
+                    onNotebookPasswordChange = { notebookPassword = it })
+                if (notebookPassword.isNotBlank()) {
+                    NotebookPasswordConfirmationInput(
+                        notebookPassword,
+                        notebookPasswordConfirm,
+                        onNotebookPasswordConfirmChange = { notebookPasswordConfirm = it })
                 }
 
-                Button(
-                    onClick = {
-                        notebookName = ""
-                        notebookDescription = ""
-                        notebookPassword = ""
-                        notebookPasswordConfirm = ""
-                    },
-                    modifier = Modifier.weight(1f)
+                // Submit, Clear, and Cancel buttons
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Clear")
-                }
+                    Button(
+                        onClick = {
+                            // TODO: Save notebook to database
+                            navController.popBackStack()
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Submit")
+                    }
 
-                Button(
-                    onClick = {
-                        navController.popBackStack()
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Cancel")
+                    Button(
+                        onClick = {
+                            notebookName = ""
+                            notebookDescription = ""
+                            notebookPassword = ""
+                            notebookPasswordConfirm = ""
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Clear")
+                    }
+
+                    Button(
+                        onClick = {
+                            navController.popBackStack()
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Cancel")
+                    }
                 }
             }
         }
+    )
+}
+
+@Composable
+fun NotebookNameInput(notebookName: String, onNotebookNameChange: (String) -> Unit) {
+    OutlinedTextField(
+        value = notebookName,
+        onValueChange = onNotebookNameChange,
+        label = { Text("Notebook Name") },
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+fun NotebookDescriptionInput(notebookDescription: String, onNotebookDescriptionChange: (String) -> Unit) {
+    OutlinedTextField(
+        value = notebookDescription,
+        onValueChange = onNotebookDescriptionChange,
+        label = { Text("Notebook Description") },
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+fun NotebookPasswordInput(notebookPassword: String, onNotebookPasswordChange: (String) -> Unit) {
+    OutlinedTextField(
+        value = notebookPassword,
+        onValueChange = onNotebookPasswordChange,
+        label = { Text("Notebook Password (Optional)") },
+        singleLine = true,
+        visualTransformation = PasswordVisualTransformation(),
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+fun NotebookPasswordConfirmationInput(notebookPassword: String, notebookPasswordConfirm: String, onNotebookPasswordConfirmChange: (String) -> Unit) {
+    if (notebookPassword.isNotBlank()) {
+        OutlinedTextField(
+            value = notebookPasswordConfirm,
+            onValueChange = onNotebookPasswordConfirmChange,
+            label = { Text("Confirm Password") },
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
