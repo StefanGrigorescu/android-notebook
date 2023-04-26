@@ -20,25 +20,6 @@ import com.example.notebook.models.Notebook
 import com.example.notebook.navigation.Screen
 import java.util.*
 
-//@AndroidEntryPoint
-//class NotebookListFragment : Fragment() {
-//    private val viewModel: NotebookViewModel by viewModels()
-//
-//    override fun onCreateView(
-//        inflater: LayoutInflater,
-//        container: ViewGroup?,
-//        savedInstanceState: Bundle?
-//    ): View {
-//        return ComposeView(requireContext()).apply {
-//            setContent {
-//                val notebooks by viewModel.notebooks.collectAsState(emptyList())
-//
-//                NotebookList(notebooks, navController = findNavController())
-//            }
-//        }
-//    }
-//}
-
 @Composable
 fun NotebookList(navController: NavController) {
     val notebooks: List<Notebook> = getNotebooks()
