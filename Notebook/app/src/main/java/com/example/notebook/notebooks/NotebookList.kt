@@ -15,21 +15,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.notebook.AppBrand
 import com.example.notebook.models.Notebook
+import com.example.notebook.navigation.BottomBar
 import com.example.notebook.navigation.Screen
 import java.util.*
 
 @Composable
-fun NotebookList(navController: NavController) {
+fun NotebookList(navController: NavHostController) {
     val notebooks: List<Notebook> = getNotebooks()
     val (filteredNotebooks, setFilteredNotebooks) = remember { mutableStateOf(notebooks) }
 
     Scaffold(
         topBar = {
-            AppBrand("Notebooks List")
+            AppBrand(Screen.NotebookList.screenName)
         },
+        bottomBar = { BottomBar(navController = navController) },
         floatingActionButton = { AddNotebookButton(navController) },
         floatingActionButtonPosition = FabPosition.End,
         content = {
@@ -145,7 +147,7 @@ fun NotebookListItem(notebook: Notebook) {
 }
 
 @Composable
-fun AddNotebookButton(navController: NavController) {
+fun AddNotebookButton(navController: NavHostController) {
     FloatingActionButton(
         onClick = { navController.navigate(Screen.CreateNotebook.route) },
         content = { Icon(Icons.Filled.Add, contentDescription = stringResource(id = R.string.add_notebook_button_description)) },

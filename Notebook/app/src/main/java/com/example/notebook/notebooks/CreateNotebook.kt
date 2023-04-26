@@ -13,11 +13,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.notebook.AppBrand
+import com.example.notebook.navigation.BottomBar
+import com.example.notebook.navigation.Screen
 
 @Composable
-fun CreateNotebook(navController: NavController) {
+fun CreateNotebook(navController: NavHostController) {
     var notebookName by rememberSaveable("notebookName") { mutableStateOf("") }
     var notebookDescription by rememberSaveable("notebookDescription") { mutableStateOf("") }
     var notebookPassword by rememberSaveable("notebookPassword") { mutableStateOf("") }
@@ -25,8 +27,9 @@ fun CreateNotebook(navController: NavController) {
 
     Scaffold(
         topBar = {
-            AppBrand("Create Notebook")
+            AppBrand(Screen.CreateNotebook.screenName)
         },
+        bottomBar = { BottomBar(navController = navController) },
         content = { padding ->
             Column(
                 modifier = Modifier

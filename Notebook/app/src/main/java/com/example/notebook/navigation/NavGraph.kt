@@ -6,6 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.notebook.notebooks.CreateNotebook
 import com.example.notebook.notebooks.NotebookList
+import com.example.notebook.profile.ProfileDetails
+import com.example.notebook.settings.Settings
 
 @Composable
 fun SetupNavGraph(
@@ -17,5 +19,7 @@ fun SetupNavGraph(
     ) {
         composable(Screen.NotebookList.route) { NotebookList(navController = navController) }
         composable(Screen.CreateNotebook.route) { CreateNotebook(navController = navController) }
+        composable(BottomBarScreen.Profile.route) { ProfileDetails(navController = navController) }
+        composable(BottomBarScreen.Settings.route) { Settings(navController = navController) }
     }
 }
