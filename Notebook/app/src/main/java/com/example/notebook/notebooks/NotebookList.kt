@@ -28,7 +28,7 @@ fun NotebookList(navController: NavController) {
 
     Scaffold(
         topBar = {
-            AppBrand()
+            AppBrand("Notebooks List")
         },
         floatingActionButton = { AddNotebookButton(navController) },
         floatingActionButtonPosition = FabPosition.End,
@@ -107,7 +107,7 @@ fun NotebookListView(notebooks: List<Notebook>, padding: PaddingValues) {
         if (notebooks.isEmpty()) {
             Text(
                 text = stringResource(id = R.string.no_notebooks),
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.h5,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
         } else {

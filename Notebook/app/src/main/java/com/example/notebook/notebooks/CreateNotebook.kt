@@ -25,7 +25,7 @@ fun CreateNotebook(navController: NavController) {
 
     Scaffold(
         topBar = {
-            AppBrand()
+            AppBrand("Create Notebook")
         },
         content = { padding ->
             Column(
