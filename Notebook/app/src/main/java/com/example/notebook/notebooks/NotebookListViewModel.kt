@@ -12,22 +12,16 @@ import kotlinx.coroutines.launch
 class NotebooksViewModel(
     private val dao: NotebooksDao
 ): ViewModel() {
-    private val _notebooksSortBy = MutableStateFlow(NotebooksSortBy.DateCreatedAsc)
-    private val _notebooks = _notebooksSortBy
-        .flatMapLatest { sortType ->
-            when(sortType) {
-                NotebooksSortBy.Id -> dao.getAllOrderById()
-                NotebooksSortBy.Title -> dao.getAllOrderByTitle()
-                NotebooksSortBy.DateCreatedAsc -> dao.getAllOrderByDateCreated()
-                NotebooksSortBy.DateCreatedDesc -> dao.getAllOrderByDateCreatedDescending()
-            }
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-
     private val _notebooksState = MutableStateFlow(NotebooksState())
-    val notebooksState = combine(_notebooksState, _notebooksSortBy, _notebooks) { state, notebooksSortBy, notebooks ->
+    private val _notebooksSortBy = MutableStateFlow(NotebooksSortBy.DateCreatedAsc)
+    private val _notebooksSearchText = MutableStateFlow("")
+    private val _notebooks = _notebooksSortBy
+        .flatMapLatest { sortBy -> getNotebookEntities(sortBy, _notebooksSearchText.value, dao) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+    val notebooksState = combine(_notebooksState, _notebooksSortBy, _notebooksSearchText, _notebooks) { state, notebooksSortBy, notebooksSearchText, notebooks ->
         state.copy(
             sortBy = notebooksSortBy,
+            searchText = notebooksSearchText,
             notebooks = notebooks
                 .map { entity -> entity.toNotebook() },
         )
@@ -37,7 +31,7 @@ class NotebooksViewModel(
         val title = notebooksState.value.title
         val description = notebooksState.value.description
         val password = notebooksState.value.password
-        val passwordConfirm = notebooksState.value.passwordConfirm
+        val passwordConfirm = notebooksState.value.confirmPassword
 
         if(title.isEmpty() || description.isEmpty()) {
             return
@@ -63,7 +57,8 @@ class NotebooksViewModel(
             title = "",
             description = "",
             password = "",
-            passwordConfirm = ""
+            confirmPassword = "",
+            inputCurrentPassword = ""
         ) }
     }
 
@@ -79,8 +74,35 @@ class NotebooksViewModel(
         )  }
     }
 
+    fun onEditNotebookPasswordEvent(event: NotebooksEvent.EditNotebookPasswordEvent) {
+        _notebooksState.update { it.copy(
+            password = event.password
+        )  }
+
+        if(event.password.isEmpty()) {
+            _notebooksState.update { it.copy(
+                confirmPassword = ""
+            ) }
+        }
+    }
+
+    fun onEditNotebookConfirmPasswordEvent(event: NotebooksEvent.EditNotebookConfirmPasswordEvent) {
+        _notebooksState.update { it.copy(
+            confirmPassword = event.confirmPassword
+        )  }
+    }
+
     fun onChangeNotebookPasswordEvent(event: NotebooksEvent.ChangeNotebookPasswordEvent) {
 
+    }
+
+    fun onClearCreateNotebookFormEvent(event: NotebooksEvent.ClearCreateNotebookFormEvent) {
+        _notebooksState.update { it.copy(
+            title = "",
+            description = "",
+            password = "",
+            confirmPassword = ""
+        )  }
     }
 
     fun onDeleteNotebook(event: NotebooksEvent.DeleteNotebookEvent) {
@@ -92,15 +114,24 @@ class NotebooksViewModel(
     fun onSortNotebooks(event: NotebooksEvent.SortNotebooksEvent) {
         _notebooksSortBy.value = event.sortBy
     }
+
+    fun onSearchNotebooks(event: NotebooksEvent.SearchNotebookEvent) {
+        _notebooksSearchText.value = event.searchText
+    }
 }
 
 sealed interface NotebooksEvent {
     data class SaveNotebookEvent(val title: String, val description: String, val password: String?): NotebooksEvent
     data class EditNotebookTitleEvent(val title: String): NotebooksEvent
     data class EditNotebookDescriptionEvent(val description: String): NotebooksEvent
+    data class EditNotebookPasswordEvent(val password: String): NotebooksEvent
+    data class EditNotebookConfirmPasswordEvent(val confirmPassword: String): NotebooksEvent
     data class ChangeNotebookPasswordEvent(val newPassword: String, val confirmNewPassword: String): NotebooksEvent
+    object ClearCreateNotebookFormEvent: NotebooksEvent
+
     data class DeleteNotebookEvent(val id: Long?): NotebooksEvent
     data class SortNotebooksEvent(val sortBy: NotebooksSortBy): NotebooksEvent
+    data class SearchNotebookEvent(val searchText: String): NotebooksEvent
 }
 
 enum class NotebooksSortBy {
@@ -113,9 +144,34 @@ enum class NotebooksSortBy {
 data class NotebooksState(
     val notebooks: List<Notebook> = emptyList(),
     val sortBy: NotebooksSortBy = NotebooksSortBy.DateCreatedAsc,
+    val searchText: String = "",
 
     var title: String = "",
     var description: String = "",
     var password: String = "",
-    var passwordConfirm: String = ""
+    var confirmPassword: String = "",
+
+    var inputCurrentPassword: String = ""
 )
+
+private fun getNotebookEntities(
+    sortBy: NotebooksSortBy,
+    searchText: String,
+    dao: NotebooksDao)
+: Flow<List<NotebookEntity>> {
+    if(searchText.isEmpty()) {
+        return when (sortBy) {
+            NotebooksSortBy.Id -> dao.getAllOrderById()
+            NotebooksSortBy.Title -> dao.getAllOrderByTitle()
+            NotebooksSortBy.DateCreatedAsc -> dao.getAllOrderByDateCreated()
+            NotebooksSortBy.DateCreatedDesc -> dao.getAllOrderByDateCreatedDescending()
+        }
+    }
+
+    return when(sortBy) {
+        NotebooksSortBy.Id -> dao.getFilteredOrderById(searchText)
+        NotebooksSortBy.Title -> dao.getFilteredOrderByTitle(searchText)
+        NotebooksSortBy.DateCreatedAsc -> dao.getFilteredOrderByDateCreated(searchText)
+        NotebooksSortBy.DateCreatedDesc -> dao.getFilteredOrderByDateCreatedDescending(searchText)
+    }
+}
