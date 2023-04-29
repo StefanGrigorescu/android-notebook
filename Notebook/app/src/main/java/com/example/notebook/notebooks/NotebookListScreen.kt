@@ -20,15 +20,23 @@ import androidx.navigation.NavHostController
 import com.example.notebook.AppBrand
 import com.example.notebook.navigation.BottomBar
 import com.example.notebook.navigation.Screen
+import org.koin.androidx.compose.getViewModel
 import java.util.*
 
 @Composable
 fun NotebookListScreen(
-    notebooksState: NotebooksState,
-    onSortNotebooks: (NotebooksEvent.SortNotebooksEvent) -> Unit,
-    onSearchNotebooks: (NotebooksEvent.SearchNotebookEvent) -> Unit,
     navController: NavHostController
 ) {
+    val notebooksViewModel: NotebooksViewModel = getViewModel<NotebooksViewModel>()
+    val notebooksState: NotebooksState by notebooksViewModel.notebooksState.collectAsState()
+
+    val onSortNotebooks: (NotebooksEvent.SortNotebooksEvent) -> Unit = { event ->
+        notebooksViewModel.onSortNotebooks(event)
+    }
+    val onSearchNotebooks: (NotebooksEvent.SearchNotebookEvent) -> Unit = { event ->
+        notebooksViewModel.onSearchNotebooks(event)
+    }
+
     Scaffold(
         topBar = {
             AppBrand(Screen.NotebookList.screenName)

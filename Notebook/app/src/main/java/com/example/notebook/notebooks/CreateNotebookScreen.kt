@@ -6,6 +6,8 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -13,18 +15,34 @@ import androidx.navigation.NavHostController
 import com.example.notebook.AppBrand
 import com.example.notebook.navigation.BottomBar
 import com.example.notebook.navigation.Screen
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun CreateNotebookScreen(
-    notebooksState: NotebooksState,
-    onSaveNotebook: (NotebooksEvent.SaveNotebookEvent) -> Unit,
-    onEditNotebookTitleEvent: (NotebooksEvent.EditNotebookTitleEvent) -> Unit,
-    onEditNotebookDescriptionEvent: (NotebooksEvent.EditNotebookDescriptionEvent) -> Unit,
-    onEditNotebookPasswordEvent: (NotebooksEvent.EditNotebookPasswordEvent) -> Unit,
-    onEditNotebookConfirmPasswordEvent: (NotebooksEvent.EditNotebookConfirmPasswordEvent) -> Unit,
-    onClearCreateNotebookFormEvent: (NotebooksEvent.ClearCreateNotebookFormEvent) -> Unit,
     navController: NavHostController
 ) {
+    val notebooksViewModel = getViewModel<NotebooksViewModel>()
+    val notebooksState by notebooksViewModel.notebooksState.collectAsState()
+
+    val onSaveNotebook: (NotebooksEvent.SaveNotebookEvent) -> Unit = { event ->
+        notebooksViewModel.onSaveNotebook(event)
+    }
+    val onEditNotebookTitleEvent: (NotebooksEvent.EditNotebookTitleEvent) -> Unit = { event ->
+        notebooksViewModel.onEditNotebookTitleEvent(event)
+    }
+    val onEditNotebookDescriptionEvent: (NotebooksEvent.EditNotebookDescriptionEvent) -> Unit = { event ->
+        notebooksViewModel.onEditNotebookDescriptionEvent(event)
+    }
+    val onEditNotebookPasswordEvent: (NotebooksEvent.EditNotebookPasswordEvent) -> Unit = { event ->
+        notebooksViewModel.onEditNotebookPasswordEvent(event)
+    }
+    val onEditNotebookConfirmPasswordEvent: (NotebooksEvent.EditNotebookConfirmPasswordEvent) -> Unit = { event ->
+        notebooksViewModel.onEditNotebookConfirmPasswordEvent(event)
+    }
+    val onClearCreateNotebookFormEvent: (NotebooksEvent.ClearCreateNotebookFormEvent) -> Unit = { event ->
+        notebooksViewModel.onClearCreateNotebookFormEvent(event)
+    }
+
     Scaffold(
         topBar = {
             AppBrand(Screen.CreateNotebook.screenName)

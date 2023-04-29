@@ -16,6 +16,7 @@ abstract class AppDatabase: RoomDatabase() {
 
     companion object {
         private var Instance: AppDatabase? = null
+
         fun getInstace(context: Context): AppDatabase {
             if(Instance == null) {
                 Instance = Room.databaseBuilder(context, AppDatabase::class.java, name = "notebook.db")

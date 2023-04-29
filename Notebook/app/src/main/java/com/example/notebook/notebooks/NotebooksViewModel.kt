@@ -2,21 +2,21 @@ package com.example.notebook.notebooks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.notebook.data.INotebooksRepo
 import com.example.notebook.data.NotebookEntity
-import com.example.notebook.data.NotebooksDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NotebooksViewModel(
-    private val dao: NotebooksDao
+    private val repo: INotebooksRepo
 ): ViewModel() {
     private val _notebooksState = MutableStateFlow(NotebooksState())
     private val _notebooksSortBy = MutableStateFlow(NotebooksSortBy.DateCreatedAsc)
     private val _notebooksSearchText = MutableStateFlow("")
     private val _notebooks = _notebooksSortBy
-        .flatMapLatest { sortBy -> getNotebookEntities(sortBy, _notebooksSearchText.value, dao) }
+        .flatMapLatest { sortBy -> repo.getNotebookEntities(sortBy, _notebooksSearchText.value) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
     val notebooksState = combine(_notebooksState, _notebooksSortBy, _notebooksSearchText, _notebooks) { state, notebooksSortBy, notebooksSearchText, notebooks ->
         state.copy(
@@ -27,7 +27,7 @@ class NotebooksViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000), NotebooksState())
 
-    fun onSaveNotebook(event: NotebooksEvent.SaveNotebookEvent) {
+    fun onSaveNotebook(event: NotebooksEvent.SaveNotebookEvent): Unit {
         val title = notebooksState.value.title
         val description = notebooksState.value.description
         val password = notebooksState.value.password
@@ -50,7 +50,7 @@ class NotebooksViewModel(
         )
 
         viewModelScope.launch {
-            dao.insert(notebookEntity)
+            repo.insert(notebookEntity)
         }
 
         _notebooksState.update { it.copy(
@@ -62,19 +62,19 @@ class NotebooksViewModel(
         ) }
     }
 
-    fun onEditNotebookTitleEvent(event: NotebooksEvent.EditNotebookTitleEvent) {
+    fun onEditNotebookTitleEvent(event: NotebooksEvent.EditNotebookTitleEvent): Unit {
         _notebooksState.update { it.copy(
             title = event.title
         )  }
     }
 
-    fun onEditNotebookDescriptionEvent(event: NotebooksEvent.EditNotebookDescriptionEvent) {
+    fun onEditNotebookDescriptionEvent(event: NotebooksEvent.EditNotebookDescriptionEvent): Unit {
         _notebooksState.update { it.copy(
             description = event.description
         )  }
     }
 
-    fun onEditNotebookPasswordEvent(event: NotebooksEvent.EditNotebookPasswordEvent) {
+    fun onEditNotebookPasswordEvent(event: NotebooksEvent.EditNotebookPasswordEvent): Unit {
         _notebooksState.update { it.copy(
             password = event.password
         )  }
@@ -86,17 +86,17 @@ class NotebooksViewModel(
         }
     }
 
-    fun onEditNotebookConfirmPasswordEvent(event: NotebooksEvent.EditNotebookConfirmPasswordEvent) {
+    fun onEditNotebookConfirmPasswordEvent(event: NotebooksEvent.EditNotebookConfirmPasswordEvent): Unit {
         _notebooksState.update { it.copy(
             confirmPassword = event.confirmPassword
         )  }
     }
 
-    fun onChangeNotebookPasswordEvent(event: NotebooksEvent.ChangeNotebookPasswordEvent) {
+    fun onChangeNotebookPasswordEvent(event: NotebooksEvent.ChangeNotebookPasswordEvent): Unit {
 
     }
 
-    fun onClearCreateNotebookFormEvent(event: NotebooksEvent.ClearCreateNotebookFormEvent) {
+    fun onClearCreateNotebookFormEvent(event: NotebooksEvent.ClearCreateNotebookFormEvent): Unit {
         _notebooksState.update { it.copy(
             title = "",
             description = "",
@@ -105,17 +105,17 @@ class NotebooksViewModel(
         )  }
     }
 
-    fun onDeleteNotebook(event: NotebooksEvent.DeleteNotebookEvent) {
+    fun onDeleteNotebook(event: NotebooksEvent.DeleteNotebookEvent): Unit {
         viewModelScope.launch {
-            dao.deleteById(event.id)
+            repo.deleteById(event.id)
         }
     }
 
-    fun onSortNotebooks(event: NotebooksEvent.SortNotebooksEvent) {
+    fun onSortNotebooks(event: NotebooksEvent.SortNotebooksEvent): Unit {
         _notebooksSortBy.value = event.sortBy
     }
 
-    fun onSearchNotebooks(event: NotebooksEvent.SearchNotebookEvent) {
+    fun onSearchNotebooks(event: NotebooksEvent.SearchNotebookEvent): Unit {
         _notebooksSearchText.value = event.searchText
     }
 }
@@ -153,25 +153,3 @@ data class NotebooksState(
 
     var inputCurrentPassword: String = ""
 )
-
-private fun getNotebookEntities(
-    sortBy: NotebooksSortBy,
-    searchText: String,
-    dao: NotebooksDao)
-: Flow<List<NotebookEntity>> {
-    if(searchText.isEmpty()) {
-        return when (sortBy) {
-            NotebooksSortBy.Id -> dao.getAllOrderById()
-            NotebooksSortBy.Title -> dao.getAllOrderByTitle()
-            NotebooksSortBy.DateCreatedAsc -> dao.getAllOrderByDateCreated()
-            NotebooksSortBy.DateCreatedDesc -> dao.getAllOrderByDateCreatedDescending()
-        }
-    }
-
-    return when(sortBy) {
-        NotebooksSortBy.Id -> dao.getFilteredOrderById(searchText)
-        NotebooksSortBy.Title -> dao.getFilteredOrderByTitle(searchText)
-        NotebooksSortBy.DateCreatedAsc -> dao.getFilteredOrderByDateCreated(searchText)
-        NotebooksSortBy.DateCreatedDesc -> dao.getFilteredOrderByDateCreatedDescending(searchText)
-    }
-}

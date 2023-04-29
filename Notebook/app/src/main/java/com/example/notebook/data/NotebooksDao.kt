@@ -32,14 +32,14 @@ interface NotebooksDao {
 
 
     @Insert
-    suspend fun insert(notebook: NotebookEntity)
+    suspend fun insert(notebook: NotebookEntity): Unit
 
     @Update
-    suspend fun update(notebook: NotebookEntity)
+    suspend fun update(notebook: NotebookEntity): Unit
 
     @Delete
-    suspend fun delete(notebook: NotebookEntity)
+    suspend fun delete(notebook: NotebookEntity): Unit
 
     @Query("DELETE FROM notebooks WHERE id = :id")
-    suspend fun deleteById(id: Long?)
+    suspend fun deleteById(id: Long?): Unit
 }

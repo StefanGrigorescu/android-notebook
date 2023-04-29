@@ -55,8 +55,11 @@ dependencies {
     implementation 'androidx.room:room-common:2.5.1'
     kapt "com.google.dagger:hilt-compiler:2.44"
 
+    // room
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
+//    implementation "android.arch.persistence.room:runtime:$arch_version"
+    // kapt "android.arch.persistence.room:compiler:$arch_version"
 
     implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
@@ -66,6 +69,19 @@ dependencies {
     implementation 'androidx.compose.material:material:1.4.2'
     implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.core:core-ktx:1.10.0'
+
+    // koin
+    implementation "io.insert-koin:koin-android:$koin_version"
+    implementation "io.insert-koin:koin-androidx-navigation:$koin_version"
+    implementation "io.insert-koin:koin-androidx-compose:$koin_version"
+
+    // view model
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1"
+
+    // retrofit
+    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation "com.squareup.retrofit2:converter-moshi:2.9.0"
+    implementation "com.squareup.okhttp3:okhttp:5.0.0-alpha.3"
 
     // unit tests
     testImplementation 'junit:junit:4.13.2'
@@ -79,6 +95,9 @@ dependencies {
 
     // Room test helpers
     testImplementation "androidx.room:room-testing:$room_version"
+
+    // DI tests
+    testImplementation "io.insert-koin:koin-test-junit4:$koin_version"
 }
 
 // Allow references to generated code
