@@ -21,27 +21,8 @@ import org.koin.androidx.compose.getViewModel
 fun CreateNotebookScreen(
     navController: NavHostController
 ) {
-    val viewModel = getViewModel<CreateNotebookViewModel>()
-    val notebookState by viewModel.notebookState.collectAsState()
-
-    val onSaveNotebook: (CreateNotebookScreenEvent.SaveNotebookEvent) -> Unit = { event ->
-        viewModel.onSaveNotebook(event)
-    }
-    val onEditNotebookTitleEvent: (CreateNotebookScreenEvent.EditNotebookTitleEvent) -> Unit = { event ->
-        viewModel.onEditNotebookTitleEvent(event)
-    }
-    val onEditNotebookDescriptionEvent: (CreateNotebookScreenEvent.EditNotebookDescriptionEvent) -> Unit = { event ->
-        viewModel.onEditNotebookDescriptionEvent(event)
-    }
-    val onEditNotebookPasswordEvent: (CreateNotebookScreenEvent.EditNotebookPasswordEvent) -> Unit = { event ->
-        viewModel.onEditNotebookPasswordEvent(event)
-    }
-    val onEditNotebookConfirmPasswordEvent: (CreateNotebookScreenEvent.EditNotebookConfirmPasswordEvent) -> Unit = { event ->
-        viewModel.onEditNotebookConfirmPasswordEvent(event)
-    }
-    val onClearCreateNotebookFormEvent: (CreateNotebookScreenEvent.ClearCreateNotebookFormEvent) -> Unit = { event ->
-        viewModel.onClearCreateNotebookFormEvent(event)
-    }
+    val viewModel: CreateNotebookViewModel = getViewModel<CreateNotebookViewModel>()
+    val state: CreateNotebookScreenState by viewModel.screenState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -56,23 +37,22 @@ fun CreateNotebookScreen(
                     .padding(PaddingValues(start = 20.dp, end = 20.dp,)),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                NotebookTitleInput(
-                    notebookState.title,
-                    onEditNotebookTitleEvent)
+                NotebookTitleInput(state.title) { event ->
+                    viewModel.onEvent(event)
+                }
 
-                NotebookDescriptionInput(
-                    notebookState.description,
-                    onEditNotebookDescriptionEvent)
+                NotebookDescriptionInput(state.description) { event ->
+                    viewModel.onEvent(event)
+                }
 
-                NotebookPasswordInput(
-                    notebookState.password,
-                    onEditNotebookPasswordEvent)
+                NotebookPasswordInput(state.password) { event ->
+                    viewModel.onEvent(event)
+                }
 
-                if (notebookState.password.isNotBlank()) {
-                    NotebookPasswordConfirmationInput(
-                        notebookState.password,
-                        notebookState.confirmPassword,
-                        onEditNotebookConfirmPasswordEvent)
+                if (state.password.isNotBlank()) {
+                    NotebookPasswordConfirmationInput(state.password, state.confirmPassword) { event ->
+                        viewModel.onEvent(event)
+                    }
                 }
 
                 // Submit, Clear, and Cancel buttons
@@ -82,7 +62,11 @@ fun CreateNotebookScreen(
                 ) {
                     Button(
                         onClick = {
-                            onSaveNotebook(CreateNotebookScreenEvent.SaveNotebookEvent(notebookState.title, notebookState.description, notebookState.password))
+                            viewModel.onEvent(NotebooksEvent.SubmitFormEvent(
+                                state.title,
+                                state.description,
+                                state.password
+                            ))
                             navController.popBackStack()
                         },
                         modifier = Modifier.weight(1f)
@@ -91,7 +75,9 @@ fun CreateNotebookScreen(
                     }
 
                     Button(
-                        onClick = { onClearCreateNotebookFormEvent(CreateNotebookScreenEvent.ClearCreateNotebookFormEvent) },
+                        onClick = {
+                            viewModel.onEvent(NotebooksEvent.ClearFormEvent)
+                        },
                         modifier = Modifier.weight(1f)
                     ) {
                         Text("Clear")
@@ -113,12 +99,12 @@ fun CreateNotebookScreen(
 
 @Composable
 fun NotebookTitleInput(
-    notebookName: String,
-    onEditNotebookTitleEvent: (CreateNotebookScreenEvent.EditNotebookTitleEvent) -> Unit) {
+    title: String,
+    onSetTitleEvent: (NotebooksEvent.SetTitleEvent) -> Unit) {
     OutlinedTextField(
-        value = notebookName,
+        value = title,
         onValueChange = { newValue: String ->
-            onEditNotebookTitleEvent(CreateNotebookScreenEvent.EditNotebookTitleEvent(newValue))
+            onSetTitleEvent(NotebooksEvent.SetTitleEvent(newValue))
         },
         label = { Text("Notebook Name") },
         singleLine = true,
@@ -128,12 +114,12 @@ fun NotebookTitleInput(
 
 @Composable
 fun NotebookDescriptionInput(
-    notebookDescription: String,
-    onEditNotebookDescriptionEvent: (CreateNotebookScreenEvent.EditNotebookDescriptionEvent) -> Unit) {
+    description: String,
+    onSetDescriptionEvent: (NotebooksEvent.SetDescriptionEvent) -> Unit) {
     OutlinedTextField(
-        value = notebookDescription,
+        value = description,
         onValueChange = { newValue: String ->
-            onEditNotebookDescriptionEvent(CreateNotebookScreenEvent.EditNotebookDescriptionEvent(newValue))
+            onSetDescriptionEvent(NotebooksEvent.SetDescriptionEvent(newValue))
         },
         label = { Text("Notebook Description") },
         modifier = Modifier.fillMaxWidth()
@@ -142,12 +128,12 @@ fun NotebookDescriptionInput(
 
 @Composable
 fun NotebookPasswordInput(
-    notebookPassword: String,
-    onEditNotebookPasswordEvent: (CreateNotebookScreenEvent.EditNotebookPasswordEvent) -> Unit) {
+    password: String,
+    onSetPasswordEvent: (NotebooksEvent.SetPasswordEvent) -> Unit) {
     OutlinedTextField(
-        value = notebookPassword,
+        value = password,
         onValueChange = { newValue: String ->
-            onEditNotebookPasswordEvent(CreateNotebookScreenEvent.EditNotebookPasswordEvent(newValue))
+            onSetPasswordEvent(NotebooksEvent.SetPasswordEvent(newValue))
         },
         label = { Text("Notebook Password (Optional)") },
         singleLine = true,
@@ -158,13 +144,13 @@ fun NotebookPasswordInput(
 
 @Composable
 fun NotebookPasswordConfirmationInput(
-    notebookPassword: String, notebookPasswordConfirm: String,
-    onEditNotebookConfirmPasswordEvent: (CreateNotebookScreenEvent.EditNotebookConfirmPasswordEvent) -> Unit) {
-    if (notebookPassword.isNotBlank()) {
+    confirmPassword: String, notebookPasswordConfirm: String,
+    onSetConfirmPasswordEvent: (NotebooksEvent.SetConfirmPasswordEvent) -> Unit) {
+    if (confirmPassword.isNotBlank()) {
         OutlinedTextField(
             value = notebookPasswordConfirm,
             onValueChange = { newValue: String ->
-                onEditNotebookConfirmPasswordEvent(CreateNotebookScreenEvent.EditNotebookConfirmPasswordEvent(newValue))
+                onSetConfirmPasswordEvent(NotebooksEvent.SetConfirmPasswordEvent(newValue))
             },
             label = { Text("Confirm Password") },
             singleLine = true,

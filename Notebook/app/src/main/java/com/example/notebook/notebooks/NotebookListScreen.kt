@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -26,15 +25,8 @@ import org.koin.androidx.compose.getViewModel
 fun NotebookListScreen(
     navController: NavHostController
 ) {
-    val notebooksViewModel: NotebookListViewModel = getViewModel<NotebookListViewModel>()
-    val notebooksState: NotebooksState by notebooksViewModel.notebooksState.collectAsState()
-
-    val onSortNotebooks: (NotebookListScreenEvent.SortNotebooksEvent) -> Unit = { event ->
-        notebooksViewModel.onSortNotebooks(event)
-    }
-    val onSearchNotebooks: (NotebookListScreenEvent.SearchNotebookEvent) -> Unit = { event ->
-        notebooksViewModel.onSearchNotebooks(event)
-    }
+    val viewModel: NotebookListViewModel = getViewModel<NotebookListViewModel>()
+    val notebooksState: NotebookListScreenState by viewModel.screenState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -42,37 +34,40 @@ fun NotebookListScreen(
         },
         bottomBar = { BottomBar(navController = navController) },
         floatingActionButton = { AddNotebookButton(navController) },
-        floatingActionButtonPosition = FabPosition.End,
-        content = {padding ->
-            LazyColumn(
-                contentPadding = padding,
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    NotebookSearchView(notebooksState.searchText, onSearchNotebooks = onSearchNotebooks)
+        floatingActionButtonPosition = FabPosition.End
+    ) { padding ->
+        LazyColumn(
+            contentPadding = padding,
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                NotebookSearchView(notebooksState.searchText) { event ->
+                    viewModel.onEvent(event)
                 }
-                item {
-                    NotebookSortView(notebooksState, onSortNotebooks)
+            }
+            item {
+                NotebookSortView(notebooksState) { event ->
+                    viewModel.onEvent(event)
                 }
-                if (notebooksState.notebooks.isEmpty()) {
-                    val noNotebooksYet = "There is no notebook created yet. Try creating one!"
+            }
+            if (notebooksState.notebooks.isEmpty()) {
+                val noNotebooksYet = "There is no notebook created yet. Try creating one!"
 
-                    item {
-                        Text(
-                            text = noNotebooksYet,
-                            style = MaterialTheme.typography.h5,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                    }
-                } else {
-                    items(items = notebooksState.notebooks) { notebook ->
-                        NotebookListItem(notebook)
-                    }
+                item {
+                    Text(
+                        text = noNotebooksYet,
+                        style = MaterialTheme.typography.h5,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
+            } else {
+                items(items = notebooksState.notebooks) { notebook ->
+                    NotebookListItem(notebook, navController)
                 }
             }
         }
-    )
+    }
 }
 
 @Composable
@@ -93,14 +88,14 @@ fun AddNotebookButton(navController: NavHostController) {
 @Composable
 fun NotebookSearchView(
     stateSearchText: String,
-    onSearchNotebooks: (NotebookListScreenEvent.SearchNotebookEvent) -> Unit
+    onSearchNotebooks: (NotebooksEvent.SearchNotebookEvent) -> Unit
 ) {
     val searchNotebookHint = "Search notebook by name or by description"
 
     TextField(
         value = stateSearchText,
         onValueChange = { newSearchText: String ->
-            onSearchNotebooks(NotebookListScreenEvent.SearchNotebookEvent(newSearchText))
+            onSearchNotebooks(NotebooksEvent.SearchNotebookEvent(newSearchText))
         },
         label = { Text(searchNotebookHint) },
         leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
@@ -110,8 +105,9 @@ fun NotebookSearchView(
 
 @Composable
 fun NotebookSortView(
-    notebooksState: NotebooksState,
-    onSortNotebooks: (NotebookListScreenEvent.SortNotebooksEvent) -> Unit) {
+    notebooksState: NotebookListScreenState,
+    onSortNotebooks: (NotebooksEvent.SortNotebooksEvent) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -122,14 +118,14 @@ fun NotebookSortView(
             Row(
                 modifier = Modifier
                     .clickable {
-                        onSortNotebooks(NotebookListScreenEvent.SortNotebooksEvent(sortBy))
+                        onSortNotebooks(NotebooksEvent.SortNotebooksEvent(sortBy))
                     },
                 verticalAlignment = CenterVertically
             ) {
                 RadioButton(
                     selected = notebooksState.sortBy == sortBy,
                     onClick = {
-                        onSortNotebooks(NotebookListScreenEvent.SortNotebooksEvent(sortBy))
+                        onSortNotebooks(NotebooksEvent.SortNotebooksEvent(sortBy))
                     })
                 Text(text = sortBy.toString())
             }
@@ -138,7 +134,10 @@ fun NotebookSortView(
 }
 
 @Composable
-fun NotebookListItem(notebook: Notebook) {
+fun NotebookListItem(
+    notebook: Notebook,
+    navController: NavHostController
+) {
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -147,7 +146,12 @@ fun NotebookListItem(notebook: Notebook) {
                 .padding(PaddingValues(start = 20.dp, ))
                 .weight(1f)
                 .clickable(onClick = {
-                    /* Handle notebook item click */
+                    if(notebook.hasPassword) {
+                        navController.navigate(Screen.NotebookLock.routeFactory(notebook.id))
+                    } else {
+                        // TODO: Uncomment the following line after adding the new screen and registering it in the screens enum with a route factory too
+                        // navController.navigate(Screen.NoteListScreen.routeFactory(notebook.id))
+                    }
                 }),
         ) {
             Text(
@@ -161,7 +165,9 @@ fun NotebookListItem(notebook: Notebook) {
             )
         }
         IconButton(
-            onClick = { /*TODO*/ }) {
+            onClick = {
+                // TODO: Open a "more options" dropdown for the item
+            }) {
             Icon(imageVector = Icons.Default.MoreVert, contentDescription = "More options")
         }
     }

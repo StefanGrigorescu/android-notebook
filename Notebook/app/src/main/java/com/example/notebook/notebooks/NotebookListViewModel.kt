@@ -11,46 +11,42 @@ import kotlinx.coroutines.launch
 class NotebookListViewModel(
     private val repo: INotebooksRepo
 ): ViewModel() {
-    private val _notebooksState = MutableStateFlow(NotebooksState())
-    private val _notebooksSortBy = MutableStateFlow(NotebooksSortBy.DateCreatedAsc)
-    private val _notebooksSearchText = MutableStateFlow("")
-    private val _notebooks = _notebooksSortBy
-        .flatMapLatest { sortBy -> repo.getNotebookEntities(sortBy, _notebooksSearchText.value) }
+    private val _screenState = MutableStateFlow(NotebookListScreenState())
+    private val _sortByState = MutableStateFlow(NotebooksSortBy.DateCreatedAsc)
+    private val _searchTextState = MutableStateFlow("")
+    private val _notebooksState = _sortByState
+        .flatMapLatest { sortBy -> repo.getNotebookEntities(sortBy, _searchTextState.value) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-    val notebooksState = combine(_notebooksState, _notebooksSortBy, _notebooksSearchText, _notebooks) { state, notebooksSortBy, notebooksSearchText, notebooks ->
+    val screenState = combine(_screenState, _sortByState, _searchTextState, _notebooksState) { state, notebooksSortBy, notebooksSearchText, notebooks ->
         state.copy(
             sortBy = notebooksSortBy,
             searchText = notebooksSearchText,
             notebooks = notebooks
                 .map { entity -> entity.toNotebook() },
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000), NotebooksState())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000), NotebookListScreenState())
 
-    fun onChangeNotebookPasswordEvent(event: NotebookListScreenEvent.ChangeNotebookPasswordEvent): Unit {
+    fun onEvent(event: NotebooksEvent): Unit {
+        when(event) {
+            is NotebooksEvent.SearchNotebookEvent -> {
+                _searchTextState.value = event.searchText
+            }
+            is NotebooksEvent.SortNotebooksEvent -> {
+                _sortByState.value = event.sortBy
+            }
+            is NotebooksEvent.DeleteNotebookEvent -> {
+                viewModelScope.launch {
+                    repo.deleteById(event.id)
+                }
+            }
+            is NotebooksEvent.ChangeNotebookPasswordEvent -> {
 
-    }
-
-    fun onDeleteNotebook(event: NotebookListScreenEvent.DeleteNotebookEvent): Unit {
-        viewModelScope.launch {
-            repo.deleteById(event.id)
+            }
+            else -> {
+                // Do nothing for other events
+            }
         }
     }
-
-    fun onSortNotebooks(event: NotebookListScreenEvent.SortNotebooksEvent): Unit {
-        _notebooksSortBy.value = event.sortBy
-    }
-
-    fun onSearchNotebooks(event: NotebookListScreenEvent.SearchNotebookEvent): Unit {
-        _notebooksSearchText.value = event.searchText
-    }
-}
-
-sealed interface NotebookListScreenEvent {
-    data class ChangeNotebookPasswordEvent(val newPassword: String, val confirmNewPassword: String): NotebookListScreenEvent
-    data class DeleteNotebookEvent(val id: Long?): NotebookListScreenEvent
-
-    data class SortNotebooksEvent(val sortBy: NotebooksSortBy): NotebookListScreenEvent
-    data class SearchNotebookEvent(val searchText: String): NotebookListScreenEvent
 }
 
 enum class NotebooksSortBy {
@@ -69,7 +65,7 @@ enum class NotebooksSortBy {
     }
 }
 
-data class NotebooksState(
+data class NotebookListScreenState(
     val notebooks: List<Notebook> = emptyList(),
     val sortBy: NotebooksSortBy = NotebooksSortBy.DateCreatedAsc,
     val searchText: String = "",

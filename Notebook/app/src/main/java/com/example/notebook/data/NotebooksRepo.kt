@@ -29,6 +29,25 @@ class NotebooksRepo(
         }
     }
 
+    override fun getNotebookEntityById(notebookId: Long?): NotebookEntity? {
+        if(notebookId == null) {
+            return null
+        }
+        return dao.getOneById(notebookId)
+    }
+
+    override fun checkPassword(
+        notebookId: Long?,
+        notebookPasswordInput: String): Boolean
+    {
+        if(notebookId == null) {
+            return false;
+        }
+
+        val notebookPassword: String = dao.getOneById(notebookId)?.password ?: return false
+        return notebookPasswordInput == notebookPassword;
+    }
+
     override suspend fun insert(notebook: NotebookEntity): Unit = dao.insert(notebook)
 
     override suspend fun update(notebook: NotebookEntity): Unit = dao.update(notebook)
@@ -46,6 +65,10 @@ interface INotebooksRepo {
     fun getNotebookEntities(
         sortBy: NotebooksSortBy,
         searchText: String): Flow<List<NotebookEntity>>
+
+    fun getNotebookEntityById(notebookId: Long?): NotebookEntity?
+
+    fun checkPassword(notebookId: Long?, notebookPasswordInput: String): Boolean
 
     suspend fun insert(notebook: NotebookEntity): Unit
 

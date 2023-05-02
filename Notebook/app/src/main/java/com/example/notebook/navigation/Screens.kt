@@ -17,13 +17,19 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 
 sealed class Screen(val route: String, val screenName: String) {
     object NotebookList : Screen(
-        route = "notebookList",
+        route = "notebooks/list",
         screenName = "Notebooks List"
     )
     object CreateNotebook : Screen(
-        route = "createNotebook",
+        route = "notebooks/create",
         screenName = "Create Notebook"
     )
+    object NotebookLock: Screen(
+        route = "notebooks/{notebookId}/locked",
+        screenName = "Notebook Lock"
+    ) {
+        fun routeFactory(notebookId: Long?) = "notebooks/$notebookId/locked"
+    }
 }
 
 sealed class BottomBarScreen (
@@ -32,7 +38,7 @@ sealed class BottomBarScreen (
     val icon: ImageVector
 ) {
     object NotebookList: BottomBarScreen(
-        route = "notebookList",
+        route = "notebooks/list",
         screenName = "Notebooks List",
         icon = Icons.Default.Home
     )

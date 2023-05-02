@@ -8,7 +8,7 @@ interface NotebooksDao {
     @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY id ASC")
     fun getFilteredOrderById(searchText: String): Flow<List<NotebookEntity>>
 
-    @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY title ASC")
+    @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY LOWER(title) ASC")
     fun getFilteredOrderByTitle(searchText: String): Flow<List<NotebookEntity>>
 
     @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY date_created ASC")
@@ -21,7 +21,7 @@ interface NotebooksDao {
     @Query("SELECT * FROM notebooks ORDER BY id ASC")
     fun getAllOrderById(): Flow<List<NotebookEntity>>
 
-    @Query("SELECT * FROM notebooks ORDER BY title ASC")
+    @Query("SELECT * FROM notebooks ORDER BY LOWER(title) ASC")
     fun getAllOrderByTitle(): Flow<List<NotebookEntity>>
 
     @Query("SELECT * FROM notebooks ORDER BY date_created ASC")
@@ -30,6 +30,8 @@ interface NotebooksDao {
     @Query("SELECT * FROM notebooks ORDER BY date_created DESC")
     fun getAllOrderByDateCreatedDescending(): Flow<List<NotebookEntity>>
 
+    @Query("SELECT * FROM notebooks WHERE id = :id LIMIT 1")
+    fun getOneById(id: Long?): NotebookEntity?
 
     @Insert
     suspend fun insert(notebook: NotebookEntity): Unit

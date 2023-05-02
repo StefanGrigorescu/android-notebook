@@ -8,7 +8,7 @@ interface NotesDao {
     @Query("SELECT * FROM notes ORDER BY id ASC")
     fun getAllOrderById(): Flow<List<NoteEntity>>
 
-    @Query("SELECT * FROM notes ORDER BY title ASC")
+    @Query("SELECT * FROM notes ORDER BY LOWER(title) ASC")
     fun getAllOrderByTitle(): Flow<List<NoteEntity>>
 
     @Query("SELECT * FROM notes ORDER BY date_created ASC")

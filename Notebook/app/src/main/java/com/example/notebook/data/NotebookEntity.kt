@@ -22,7 +22,8 @@ data class NotebookEntity(
         return Notebook(
             id,
             description,
-            title
+            title,
+            hasPassword = password != null
         )
     }
 }
