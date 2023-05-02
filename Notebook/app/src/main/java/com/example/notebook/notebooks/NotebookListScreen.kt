@@ -21,19 +21,18 @@ import com.example.notebook.AppBrand
 import com.example.notebook.navigation.BottomBar
 import com.example.notebook.navigation.Screen
 import org.koin.androidx.compose.getViewModel
-import java.util.*
 
 @Composable
 fun NotebookListScreen(
     navController: NavHostController
 ) {
-    val notebooksViewModel: NotebooksViewModel = getViewModel<NotebooksViewModel>()
+    val notebooksViewModel: NotebookListViewModel = getViewModel<NotebookListViewModel>()
     val notebooksState: NotebooksState by notebooksViewModel.notebooksState.collectAsState()
 
-    val onSortNotebooks: (NotebooksEvent.SortNotebooksEvent) -> Unit = { event ->
+    val onSortNotebooks: (NotebookListScreenEvent.SortNotebooksEvent) -> Unit = { event ->
         notebooksViewModel.onSortNotebooks(event)
     }
-    val onSearchNotebooks: (NotebooksEvent.SearchNotebookEvent) -> Unit = { event ->
+    val onSearchNotebooks: (NotebookListScreenEvent.SearchNotebookEvent) -> Unit = { event ->
         notebooksViewModel.onSearchNotebooks(event)
     }
 
@@ -94,14 +93,14 @@ fun AddNotebookButton(navController: NavHostController) {
 @Composable
 fun NotebookSearchView(
     stateSearchText: String,
-    onSearchNotebooks: (NotebooksEvent.SearchNotebookEvent) -> Unit
+    onSearchNotebooks: (NotebookListScreenEvent.SearchNotebookEvent) -> Unit
 ) {
     val searchNotebookHint = "Search notebook by name or by description"
 
     TextField(
         value = stateSearchText,
         onValueChange = { newSearchText: String ->
-            onSearchNotebooks(NotebooksEvent.SearchNotebookEvent(newSearchText))
+            onSearchNotebooks(NotebookListScreenEvent.SearchNotebookEvent(newSearchText))
         },
         label = { Text(searchNotebookHint) },
         leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
@@ -112,27 +111,27 @@ fun NotebookSearchView(
 @Composable
 fun NotebookSortView(
     notebooksState: NotebooksState,
-    onSortNotebooks: (NotebooksEvent.SortNotebooksEvent) -> Unit) {
+    onSortNotebooks: (NotebookListScreenEvent.SortNotebooksEvent) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState()),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = CenterVertically
     ) {
         NotebooksSortBy.values().forEach { sortBy ->
             Row(
                 modifier = Modifier
                     .clickable {
-                        onSortNotebooks(NotebooksEvent.SortNotebooksEvent(sortBy))
+                        onSortNotebooks(NotebookListScreenEvent.SortNotebooksEvent(sortBy))
                     },
                 verticalAlignment = CenterVertically
             ) {
                 RadioButton(
                     selected = notebooksState.sortBy == sortBy,
                     onClick = {
-                        onSortNotebooks(NotebooksEvent.SortNotebooksEvent(sortBy))
+                        onSortNotebooks(NotebookListScreenEvent.SortNotebooksEvent(sortBy))
                     })
-                Text(text = sortBy.name)
+                Text(text = sortBy.toString())
             }
         }
     }

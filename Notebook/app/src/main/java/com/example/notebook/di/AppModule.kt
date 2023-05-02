@@ -5,7 +5,8 @@ import com.example.notebook.data.AppDatabase
 import com.example.notebook.data.INotebooksRepo
 import com.example.notebook.data.NotebooksDao
 import com.example.notebook.data.NotebooksRepo
-import com.example.notebook.notebooks.NotebooksViewModel
+import com.example.notebook.notebooks.CreateNotebookViewModel
+import com.example.notebook.notebooks.NotebookListViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -32,7 +33,11 @@ val appModule = module {
     }
 
     viewModel {
-        NotebooksViewModel(get())
+        NotebookListViewModel(get())
+    }
+
+    viewModel {
+        CreateNotebookViewModel(get())
     }
 
     // Obs: There is also 'factory' is equivalent to Transient - a new instance for every requesting object
