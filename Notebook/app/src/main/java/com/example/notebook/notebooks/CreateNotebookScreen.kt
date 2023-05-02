@@ -45,7 +45,7 @@ fun CreateNotebookScreen(
                     viewModel.onEvent(event)
                 }
 
-                NotebookPasswordInput(state.password) { event ->
+                NotebookPasswordInput(state.password, addOptionalToPlaceholder = true) { event ->
                     viewModel.onEvent(event)
                 }
 
@@ -62,7 +62,7 @@ fun CreateNotebookScreen(
                 ) {
                     Button(
                         onClick = {
-                            viewModel.onEvent(NotebooksEvent.SubmitFormEvent(
+                            viewModel.onEvent(NotebooksEvent.SubmitCreateNotebookFormEvent(
                                 state.title,
                                 state.description,
                                 state.password
@@ -100,7 +100,8 @@ fun CreateNotebookScreen(
 @Composable
 fun NotebookTitleInput(
     title: String,
-    onSetTitleEvent: (NotebooksEvent.SetTitleEvent) -> Unit) {
+    onSetTitleEvent: (NotebooksEvent.SetTitleEvent) -> Unit
+) {
     OutlinedTextField(
         value = title,
         onValueChange = { newValue: String ->
@@ -115,7 +116,8 @@ fun NotebookTitleInput(
 @Composable
 fun NotebookDescriptionInput(
     description: String,
-    onSetDescriptionEvent: (NotebooksEvent.SetDescriptionEvent) -> Unit) {
+    onSetDescriptionEvent: (NotebooksEvent.SetDescriptionEvent) -> Unit
+) {
     OutlinedTextField(
         value = description,
         onValueChange = { newValue: String ->
@@ -129,13 +131,18 @@ fun NotebookDescriptionInput(
 @Composable
 fun NotebookPasswordInput(
     password: String,
-    onSetPasswordEvent: (NotebooksEvent.SetPasswordEvent) -> Unit) {
+    addOptionalToPlaceholder: Boolean = false,
+    onSetPasswordEvent: (NotebooksEvent.SetPasswordEvent) -> Unit,
+) {
     OutlinedTextField(
         value = password,
         onValueChange = { newValue: String ->
             onSetPasswordEvent(NotebooksEvent.SetPasswordEvent(newValue))
         },
-        label = { Text("Notebook Password (Optional)") },
+        label = {
+            val placeholder: String = if(addOptionalToPlaceholder) "Notebook Password (Optional)" else "Notebook Password"
+            Text(placeholder)
+        },
         singleLine = true,
         visualTransformation = PasswordVisualTransformation(),
         modifier = Modifier.fillMaxWidth()
@@ -145,7 +152,8 @@ fun NotebookPasswordInput(
 @Composable
 fun NotebookPasswordConfirmationInput(
     confirmPassword: String, notebookPasswordConfirm: String,
-    onSetConfirmPasswordEvent: (NotebooksEvent.SetConfirmPasswordEvent) -> Unit) {
+    onSetConfirmPasswordEvent: (NotebooksEvent.SetConfirmPasswordEvent) -> Unit
+) {
     if (confirmPassword.isNotBlank()) {
         OutlinedTextField(
             value = notebookPasswordConfirm,

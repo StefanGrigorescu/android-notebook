@@ -18,7 +18,7 @@ class CreateNotebookViewModel(
 
     fun onEvent(event: NotebooksEvent): Unit {
         when(event) {
-            is NotebooksEvent.SubmitFormEvent -> {
+            is NotebooksEvent.SubmitCreateNotebookFormEvent -> {
                 val title = screenState.value.title
                 val description = screenState.value.description
                 val password = screenState.value.password

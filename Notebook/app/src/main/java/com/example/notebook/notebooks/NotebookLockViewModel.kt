@@ -4,8 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notebook.data.INotebooksRepo
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NotebookLockViewModel(
     savedStateHandle: SavedStateHandle,
@@ -18,18 +20,29 @@ class NotebookLockViewModel(
         NotebookLockScreenState()
     )
 
-    private val notebookId: Long = checkNotNull(savedStateHandle["notebookId"])
-    var notebookTitle: String? = repo.getNotebookEntityById(notebookId)?.title
+    private val notebookId: Long = checkNotNull(savedStateHandle["notebookId"]).toString().toLong()
+    var notebookTitle: String? = null
+
+    init {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                notebookTitle = repo.getNotebookEntityById(notebookId)?.title
+            }
+        }
+    }
 
     fun onEvent(event: NotebooksEvent): Unit {
         when(event) {
-            is NotebooksEvent.SubmitFormEvent -> {
+            is NotebooksEvent.SubmitNotebookLockFormEvent -> {
+                _screenState.update { it.copy(isLoading = true) }
+
                 viewModelScope.launch {
                     val isPasswordCorrect = repo.checkPassword(notebookId, screenState.value.password)
 
                     _screenState.update { it.copy(
                         isPasswordCorrect = isPasswordCorrect,
                         isSubmitted = true,
+                        isLoading = false,
                     ) }
                 }
             }
@@ -45,6 +58,11 @@ class NotebookLockViewModel(
                     password = event.password
                 )  }
             }
+            is NotebooksEvent.SetIsLoadingEvent -> {
+                _screenState.update { it.copy(
+                    isLoading = event.isLoading
+                ) }
+            }
             else -> {
                 // Do nothing for other events
             }
@@ -56,4 +74,5 @@ data class NotebookLockScreenState(
     var password: String = "",
     var isPasswordCorrect: Boolean = false,
     var isSubmitted: Boolean = false,
+    var isLoading: Boolean = false,
 )

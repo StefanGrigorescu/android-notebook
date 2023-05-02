@@ -23,7 +23,7 @@ data class NotebookEntity(
             id,
             description,
             title,
-            hasPassword = password != null
+            hasPassword = !password.isNullOrEmpty()
         )
     }
 }

@@ -9,10 +9,12 @@ sealed interface NotebooksEvent {
     data class SearchNotebookEvent(val searchText: String): NotebooksEvent
 
     // CreateNotebookScreen and NotebookLockScreen Events:
-    data class SubmitFormEvent(val title: String, val description: String, val password: String?): NotebooksEvent
+    data class SubmitCreateNotebookFormEvent(val title: String, val description: String, val password: String?): NotebooksEvent
+    data class SubmitNotebookLockFormEvent(val password: String): NotebooksEvent
     data class SetTitleEvent(val title: String): NotebooksEvent
     data class SetDescriptionEvent(val description: String): NotebooksEvent
     data class SetPasswordEvent(val password: String): NotebooksEvent
     data class SetConfirmPasswordEvent(val confirmPassword: String): NotebooksEvent
+    data class SetIsLoadingEvent(val isLoading: Boolean): NotebooksEvent
     object ClearFormEvent: NotebooksEvent
 }
