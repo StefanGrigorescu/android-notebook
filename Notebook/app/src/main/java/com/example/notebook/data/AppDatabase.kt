@@ -1,15 +1,15 @@
 package com.example.notebook.data
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
+import java.time.OffsetDateTime
 
 @Database(
     entities = [
         NotebookEntity::class,
         NoteEntity::class],
     version=1)
+@TypeConverters(StringConverters::class)
 abstract class AppDatabase: RoomDatabase() {
     abstract val notebookDao: NotebooksDao
     abstract val noteDao: NotesDao
@@ -26,5 +26,17 @@ abstract class AppDatabase: RoomDatabase() {
             }
             return Instance as AppDatabase
         }
+    }
+}
+
+class StringConverters {
+    @TypeConverter
+    fun fromOffsetDateTime(value: OffsetDateTime?): String? {
+        return value?.toString()
+    }
+
+    @TypeConverter
+    fun toOffsetDateTime(value: String?): OffsetDateTime? {
+        return value?.let { OffsetDateTime.parse(it) }
     }
 }

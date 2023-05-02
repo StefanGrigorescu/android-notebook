@@ -10,7 +10,7 @@ data class NotebookEntity(
     var title: String = "",
     var description: String = "",
 
-    private var password: String? = null
+    var password: String? = null
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Long? = null

@@ -145,13 +145,11 @@ fun NotebookListItem(notebook: Notebook) {
     ) {
         Column(
             modifier = Modifier
-                //      .padding(16.dp)
-                //    .fillMaxWidth()
+                .padding(PaddingValues(start = 20.dp, ))
                 .weight(1f)
                 .clickable(onClick = {
                     /* Handle notebook item click */
                 }),
-            // verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = notebook.title,

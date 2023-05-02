@@ -5,16 +5,16 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NotebooksDao {
-    @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%:searchText%') OR LOWER(description) LIKE LOWER('%:searchText%')) ORDER BY id ASC")
+    @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY id ASC")
     fun getFilteredOrderById(searchText: String): Flow<List<NotebookEntity>>
 
-    @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%:searchText%') OR LOWER(description) LIKE LOWER('%:searchText%')) ORDER BY title ASC")
+    @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY title ASC")
     fun getFilteredOrderByTitle(searchText: String): Flow<List<NotebookEntity>>
 
-    @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%:searchText%') OR LOWER(description) LIKE LOWER('%:searchText%')) ORDER BY date_created ASC")
+    @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY date_created ASC")
     fun getFilteredOrderByDateCreated(searchText: String): Flow<List<NotebookEntity>>
 
-    @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%:searchText%') OR LOWER(description) LIKE LOWER('%:searchText%')) ORDER BY date_created DESC")
+    @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY date_created DESC")
     fun getFilteredOrderByDateCreatedDescending(searchText: String): Flow<List<NotebookEntity>>
 
 
