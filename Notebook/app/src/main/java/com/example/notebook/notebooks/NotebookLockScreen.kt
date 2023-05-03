@@ -5,9 +5,11 @@ import androidx.compose.material.Button
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.notebook.AppBrand
@@ -16,10 +18,7 @@ import com.example.notebook.navigation.Screen
 import org.koin.androidx.compose.getViewModel
 
 @Composable
-fun NotebookLockScreen(
-    notebookId: Long?,
-    navController: NavHostController
-) {
+fun NotebookLockScreen(navController: NavHostController) {
     val viewModel: NotebookLockViewModel = getViewModel<NotebookLockViewModel>()
     val state: NotebookLockScreenState by viewModel.screenState.collectAsState()
 
@@ -46,6 +45,19 @@ fun NotebookLockScreen(
             NotebookPasswordInput(
                 state.password
             ) { event -> viewModel.onEvent(event) }
+            if(state.isSubmitted && !state.isPasswordCorrect) {
+                Text(
+                    "Incorrect password. Notebook is still locked out.",
+                    color = Color.Red)
+            }
+
+            // This code will be executed only after the layout pass is complete
+            LaunchedEffect(state) {
+                // Listen to state.isPasswordCorrect and navigate when it is set to true
+                if (state.isPasswordCorrect) {
+                    navController.popBackStack()
+                }
+            }
 
             // Submit, Clear, and Cancel buttons
             Row(
@@ -55,8 +67,6 @@ fun NotebookLockScreen(
                 Button(
                     onClick = {
                         viewModel.onEvent(NotebooksEvent.SubmitNotebookLockFormEvent(state.password))
-
-                        navController.popBackStack()
                     },
                     modifier = Modifier.weight(1f),
                     enabled = !state.isLoading,

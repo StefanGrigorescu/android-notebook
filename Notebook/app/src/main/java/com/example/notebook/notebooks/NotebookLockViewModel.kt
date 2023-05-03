@@ -34,10 +34,17 @@ class NotebookLockViewModel(
     fun onEvent(event: NotebooksEvent): Unit {
         when(event) {
             is NotebooksEvent.SubmitNotebookLockFormEvent -> {
+                val password = screenState.value.password
+                if(password.isEmpty()) {
+                    return
+                }
+
                 _screenState.update { it.copy(isLoading = true) }
 
                 viewModelScope.launch {
-                    val isPasswordCorrect = repo.checkPassword(notebookId, screenState.value.password)
+                    val isPasswordCorrect = withContext(Dispatchers.IO) {
+                        repo . checkPassword (notebookId, password)
+                    }
 
                     _screenState.update { it.copy(
                         isPasswordCorrect = isPasswordCorrect,

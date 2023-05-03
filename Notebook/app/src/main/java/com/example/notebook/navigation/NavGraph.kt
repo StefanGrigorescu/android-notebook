@@ -20,13 +20,10 @@ fun SetupNavGraph(
     ) {
         composable(Screen.NotebookList.route) { NotebookListScreen(navController = navController) }
         composable(Screen.CreateNotebook.route) { CreateNotebookScreen(navController = navController) }
-        composable(Screen.NotebookLock.route) { backStackEntry ->
-            val notebookId = backStackEntry.arguments?.getLong("notebookId")
-            requireNotNull(notebookId) { "NavigationError: notebookId parameter not found." }
-            NotebookLockScreen(
-                notebookId = notebookId,
-                navController = navController
-            )
+        composable(Screen.NotebookLock.route) { //backStackEntry ->
+//            val notebookId = backStackEntry.arguments?.getLong("notebookId")
+//            requireNotNull(notebookId) { "NavigationError: notebookId parameter not found." }
+            NotebookLockScreen(navController = navController)
         }
         composable(BottomBarScreen.Profile.route) { ProfileDetails(navController = navController) }
         composable(BottomBarScreen.Settings.route) { Settings(navController = navController) }
