@@ -1,5 +1,6 @@
 package com.example.notebook.notes
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notebook.data.INotesRepo
@@ -9,13 +10,14 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NoteListViewModel(
+    savedStateHandle: SavedStateHandle,
     private val repo: INotesRepo
 ): ViewModel() {
     private val _screenState = MutableStateFlow(NoteListScreenState())
     private val _sortByState = MutableStateFlow(NotesSortBy.DateCreatedAsc)
     private val _searchTextState = MutableStateFlow("")
     private val _notesState = _sortByState
-        .flatMapLatest { sortBy -> repo.getNoteEntities(sortBy, _searchTextState.value) }
+        .flatMapLatest { sortBy -> repo.getNoteEntities(notebookId, sortBy, _searchTextState.value) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
     val screenState = combine(_screenState, _sortByState, _searchTextState, _notesState) { state, sortBy, searchText, notes ->
         state.copy(
@@ -25,6 +27,8 @@ class NoteListViewModel(
                 .map { entity -> entity.toNote() },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000), NoteListScreenState())
+
+    private val notebookId: Long = checkNotNull(savedStateHandle["notebookId"]).toString().toLong()
 
     fun onEvent(event: NotesEvent): Unit {
         when(event) {

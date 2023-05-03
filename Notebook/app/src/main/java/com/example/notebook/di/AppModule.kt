@@ -53,6 +53,6 @@ val appModule = module {
         NotesRepo(get())
     }
     viewModel {
-        NoteListViewModel(get())
+        NoteListViewModel(get(), get())
     }
 }

@@ -59,6 +59,7 @@ fun NotebookLockScreen(
                 // Listen to state.isPasswordCorrect and navigate when it is set to true
                 if (state.isPasswordCorrect) {
                     navController.popBackStack()
+                    navController.navigate(Screen.NoteList.routeFactory(notebookId))
                 }
             }
 

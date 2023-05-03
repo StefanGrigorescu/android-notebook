@@ -7,23 +7,24 @@ class NotesRepo(
     private val dao: NotesDao
 ): INotesRepo {
     override fun getNoteEntities(
+        notebookId: Long?,
         sortBy: NotesSortBy,
         searchText: String): Flow<List<NoteEntity>>
     {
         if(searchText.isEmpty()) {
             return when (sortBy) {
-                NotesSortBy.Id -> dao.getAllOrderById()
-                NotesSortBy.Title -> dao.getAllOrderByTitle()
-                NotesSortBy.DateCreatedAsc -> dao.getAllOrderByDateCreated()
-                NotesSortBy.DateCreatedDesc -> dao.getAllOrderByDateCreatedDescending()
+                NotesSortBy.Id -> dao.getAllByNotebookIdOrderById(notebookId)
+                NotesSortBy.Title -> dao.getAllByNotebookIdOrderByTitle(notebookId)
+                NotesSortBy.DateCreatedAsc -> dao.getAllByNotebookIdOrderByDateCreated(notebookId)
+                NotesSortBy.DateCreatedDesc -> dao.getAllByNotebookIdOrderByDateCreatedDescending(notebookId)
             }
         }
 
         return when(sortBy) {
-            NotesSortBy.Id -> dao.getFilteredOrderById(searchText)
-            NotesSortBy.Title -> dao.getFilteredOrderByTitle(searchText)
-            NotesSortBy.DateCreatedAsc -> dao.getFilteredOrderByDateCreated(searchText)
-            NotesSortBy.DateCreatedDesc -> dao.getFilteredOrderByDateCreatedDescending(searchText)
+            NotesSortBy.Id -> dao.getFilteredOrderById(notebookId, searchText)
+            NotesSortBy.Title -> dao.getFilteredOrderByTitle(notebookId, searchText)
+            NotesSortBy.DateCreatedAsc -> dao.getFilteredOrderByDateCreated(notebookId, searchText)
+            NotesSortBy.DateCreatedDesc -> dao.getFilteredOrderByDateCreatedDescending(notebookId, searchText)
         }
     }
 
@@ -45,6 +46,7 @@ class NotesRepo(
 
 interface INotesRepo {
     fun getNoteEntities(
+        notebookId: Long?,
         sortBy: NotesSortBy,
         searchText: String): Flow<List<NoteEntity>>
 
