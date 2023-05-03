@@ -20,9 +20,9 @@ data class NotebookEntity(
 
     fun toNotebook(): Notebook {
         return Notebook(
-            id,
-            description,
-            title,
+            id = id,
+            title = title,
+            description = description,
             hasPassword = !password.isNullOrEmpty()
         )
     }
@@ -33,7 +33,7 @@ data class NotebookWithNotes(
     var notebook: NotebookEntity,
     @Relation(
         parentColumn = "id",
-        entityColumn = "notebook"
+        entityColumn = "notebook_id"
     )
     var notes: List<NoteEntity>
 )

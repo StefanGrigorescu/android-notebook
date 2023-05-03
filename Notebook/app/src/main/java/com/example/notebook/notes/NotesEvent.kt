@@ -7,4 +7,8 @@ sealed interface NotesEvent {
     data class SortNotesEvent(val sortBy: NotesSortBy): NotesEvent
     data class SearchNoteEvent(val searchText: String): NotesEvent
 
+    // CreateNoteScreen Events:
+    data class SubmitCreateNoteFormEvent(val title: String): NotesEvent
+    data class SetTitleEvent(val title: String): NotesEvent
+    object ClearFormEvent: NotesEvent
 }

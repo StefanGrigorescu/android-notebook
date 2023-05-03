@@ -39,6 +39,12 @@ sealed class Screen(val route: String, val screenName: String) {
     ) {
         fun routeFactory(notebookId: Long?) = "notebooks/$notebookId/notes/list"
     }
+    object CreateNote : Screen(
+        route = "notebooks/{notebookId}/notes/create",
+        screenName = "Create Notebook"
+    ) {
+        fun routeFactory(notebookId: Long?) = "notebooks/$notebookId/notes/create"
+    }
 }
 
 sealed class BottomBarScreen (

@@ -3,20 +3,27 @@ package com.example.notebook.notebooks
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.notebook.data.INotebooksRepo
+import com.example.notebook.data.NotebookEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class NotebookListViewModel(
     private val repo: INotebooksRepo
 ): ViewModel() {
     private val _screenState = MutableStateFlow(NotebookListScreenState())
     private val _sortByState = MutableStateFlow(NotebooksSortBy.DateCreatedAsc)
     private val _searchTextState = MutableStateFlow("")
-    private val _notebooksState = _sortByState
-        .flatMapLatest { sortBy -> repo.getNotebookEntities(sortBy, _searchTextState.value) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
+    private val _notebooksState: StateFlow<List<NotebookEntity>> = combine(_sortByState, _searchTextState)
+        { sortBy, searchText ->
+            withContext(Dispatchers.IO) {
+                repo.getNotebookEntities(sortBy, searchText)
+            }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
     val screenState = combine(_screenState, _sortByState, _searchTextState, _notebooksState) { state, sortBy, searchText, notebooks ->
         state.copy(
             sortBy = sortBy,
@@ -26,9 +33,11 @@ class NotebookListViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000), NotebookListScreenState())
 
+
     fun onEvent(event: NotebooksEvent): Unit {
         when(event) {
             is NotebooksEvent.SearchNotebookEvent -> {
+                if(_searchTextState.value != event.searchText)
                 _searchTextState.value = event.searchText
             }
             is NotebooksEvent.SortNotebooksEvent -> {

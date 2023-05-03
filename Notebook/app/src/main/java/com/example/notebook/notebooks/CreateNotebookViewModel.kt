@@ -24,7 +24,7 @@ class CreateNotebookViewModel(
                 val password = screenState.value.password
                 val passwordConfirm = screenState.value.confirmPassword
 
-                if(title.isEmpty() || description.isEmpty()) {
+                if(title.isEmpty()) {
                     return
                 }
                 if(password.isEmpty() != passwordConfirm.isEmpty()) {

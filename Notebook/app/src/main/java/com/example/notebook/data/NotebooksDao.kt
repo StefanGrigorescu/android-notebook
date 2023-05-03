@@ -5,34 +5,69 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NotebooksDao {
+    // Query Flows
+    @Query("SELECT * FROM notebooks WHERE id = :id LIMIT 1")
+    fun getOneByIdFlow(id: Long?): Flow<NotebookEntity?>
+
+
     @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY id ASC")
-    fun getFilteredOrderById(searchText: String): Flow<List<NotebookEntity>>
+    fun getFilteredOrderByIdFlow(searchText: String): Flow<List<NotebookEntity>>
 
     @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY LOWER(title) ASC")
-    fun getFilteredOrderByTitle(searchText: String): Flow<List<NotebookEntity>>
+    fun getFilteredOrderByTitleFlow(searchText: String): Flow<List<NotebookEntity>>
 
     @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY date_created ASC")
-    fun getFilteredOrderByDateCreated(searchText: String): Flow<List<NotebookEntity>>
+    fun getFilteredOrderByDateCreatedFlow(searchText: String): Flow<List<NotebookEntity>>
 
     @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY date_created DESC")
-    fun getFilteredOrderByDateCreatedDescending(searchText: String): Flow<List<NotebookEntity>>
+    fun getFilteredOrderByDateCreatedDescendingFlow(searchText: String): Flow<List<NotebookEntity>>
 
 
     @Query("SELECT * FROM notebooks ORDER BY id ASC")
-    fun getAllOrderById(): Flow<List<NotebookEntity>>
+    fun getAllOrderByIdFlow(): Flow<List<NotebookEntity>>
 
     @Query("SELECT * FROM notebooks ORDER BY LOWER(title) ASC")
-    fun getAllOrderByTitle(): Flow<List<NotebookEntity>>
+    fun getAllOrderByTitleFlow(): Flow<List<NotebookEntity>>
 
     @Query("SELECT * FROM notebooks ORDER BY date_created ASC")
-    fun getAllOrderByDateCreated(): Flow<List<NotebookEntity>>
+    fun getAllOrderByDateCreatedFlow(): Flow<List<NotebookEntity>>
 
     @Query("SELECT * FROM notebooks ORDER BY date_created DESC")
-    fun getAllOrderByDateCreatedDescending(): Flow<List<NotebookEntity>>
+    fun getAllOrderByDateCreatedDescendingFlow(): Flow<List<NotebookEntity>>
 
+
+    // Query Non-Flows
     @Query("SELECT * FROM notebooks WHERE id = :id LIMIT 1")
     fun getOneById(id: Long?): NotebookEntity?
 
+
+    @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY id ASC")
+    fun getFilteredOrderById(searchText: String): List<NotebookEntity>
+
+    @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY LOWER(title) ASC")
+    fun getFilteredOrderByTitle(searchText: String): List<NotebookEntity>
+
+    @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY date_created ASC")
+    fun getFilteredOrderByDateCreated(searchText: String): List<NotebookEntity>
+
+    @Query("SELECT * FROM notebooks WHERE (LOWER(title) LIKE LOWER('%' || :searchText || '%') OR LOWER(description) LIKE LOWER('%' || :searchText || '%')) ORDER BY date_created DESC")
+    fun getFilteredOrderByDateCreatedDescending(searchText: String): List<NotebookEntity>
+
+
+    @Query("SELECT * FROM notebooks ORDER BY id ASC")
+    fun getAllOrderById(): List<NotebookEntity>
+
+    @Query("SELECT * FROM notebooks ORDER BY LOWER(title) ASC")
+    fun getAllOrderByTitle(): List<NotebookEntity>
+
+    @Query("SELECT * FROM notebooks ORDER BY date_created ASC")
+    fun getAllOrderByDateCreated(): List<NotebookEntity>
+
+    @Query("SELECT * FROM notebooks ORDER BY date_created DESC")
+    fun getAllOrderByDateCreatedDescending(): List<NotebookEntity>
+
+
+    // Commands
     @Insert
     suspend fun insert(notebook: NotebookEntity): Unit
 

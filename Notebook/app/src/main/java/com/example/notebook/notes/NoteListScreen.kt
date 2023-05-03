@@ -21,6 +21,7 @@ import androidx.navigation.NavHostController
 import com.example.notebook.AppBrand
 import com.example.notebook.navigation.BottomBar
 import com.example.notebook.navigation.Screen
+import com.example.notebook.notebooks.NotebooksEvent
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -35,7 +36,7 @@ fun NoteListScreen(
             AppBrand(Screen.NoteList.screenName)
         },
         bottomBar = { BottomBar(navController = navController) },
-        floatingActionButton = { AddNoteButton(navController) },
+        floatingActionButton = { AddNoteButton(viewModel.notebookId, navController) },
         floatingActionButtonPosition = FabPosition.End
     ) { padding ->
         LazyColumn(
@@ -73,13 +74,15 @@ fun NoteListScreen(
 }
 
 @Composable
-fun AddNoteButton(navController: NavHostController) {
+fun AddNoteButton(
+    notebookId: Long?,
+    navController: NavHostController
+) {
     val addNoteButtonDescription = "Add a new note"
 
     FloatingActionButton(
         onClick = {
-            // TODO: Uncomment the following line after adding the new screen and registering it in the screens enum
-            // navController.navigate(Screen.CreateNote.route)
+            navController.navigate(Screen.CreateNote.routeFactory(notebookId))
         },
         content = { Icon(Icons.Filled.Add, contentDescription = addNoteButtonDescription) },
         modifier = Modifier
@@ -101,8 +104,15 @@ fun NoteSearchView(
             onSearchNotes(NotesEvent.SearchNoteEvent(newSearchText))
         },
         label = { Text(searchNoteHint) },
-        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
-        modifier = Modifier.fillMaxWidth()
+        leadingIcon = {
+            Icon(
+                Icons.Filled.Search,
+                contentDescription = null,
+                modifier = Modifier
+                    .clickable {
+                        onSearchNotes(NotesEvent.SearchNoteEvent(stateSearchText))
+                    },)
+        },        modifier = Modifier.fillMaxWidth()
     )
 }
 

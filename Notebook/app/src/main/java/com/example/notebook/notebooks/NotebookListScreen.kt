@@ -98,7 +98,15 @@ fun NotebookSearchView(
             onSearchNotebooks(NotebooksEvent.SearchNotebookEvent(newSearchText))
         },
         label = { Text(searchNotebookHint) },
-        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+        leadingIcon = {
+            Icon(
+                Icons.Filled.Search,
+                contentDescription = null,
+                modifier = Modifier
+                    .clickable {
+                        onSearchNotebooks(NotebooksEvent.SearchNotebookEvent(stateSearchText))
+                    },)
+        },
         modifier = Modifier.fillMaxWidth()
     )
 }

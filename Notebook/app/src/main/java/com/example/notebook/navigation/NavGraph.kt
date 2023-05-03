@@ -8,6 +8,7 @@ import com.example.notebook.notes.NoteListScreen
 import com.example.notebook.notebooks.CreateNotebookScreen
 import com.example.notebook.notebooks.NotebookListScreen
 import com.example.notebook.notebooks.NotebookLockScreen
+import com.example.notebook.notes.CreateNoteScreen
 import com.example.notebook.profile.ProfileDetails
 import com.example.notebook.settings.Settings
 
@@ -19,6 +20,7 @@ fun SetupNavGraph(
         navController = navController,
         startDestination = Screen.NotebookList.route
     ) {
+        // Notebooks
         composable(Screen.NotebookList.route) { NotebookListScreen(navController = navController) }
         composable(Screen.CreateNotebook.route) { CreateNotebookScreen(navController = navController) }
         composable(Screen.NotebookLock.route) { backStackEntry ->
@@ -26,8 +28,14 @@ fun SetupNavGraph(
             requireNotNull(notebookId) { "NavigationError: notebookId parameter not found." }
             NotebookLockScreen(navController = navController, notebookId = notebookId)
         }
+        // Notes
         composable(Screen.NoteList.route) { NoteListScreen(navController = navController) }
+        composable(Screen.CreateNote.route) { CreateNoteScreen(navController = navController) }
+
+        // Profile
         composable(BottomBarScreen.Profile.route) { ProfileDetails(navController = navController) }
+
+        // Settings
         composable(BottomBarScreen.Settings.route) { Settings(navController = navController) }
     }
 }

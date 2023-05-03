@@ -14,12 +14,14 @@ import java.time.ZoneOffset
     foreignKeys = [ForeignKey(
         entity = NotebookEntity::class,
         parentColumns = arrayOf("id"),
-        childColumns = arrayOf("notebook"),
+        childColumns = arrayOf("notebook_id"),
         onDelete = ForeignKey.CASCADE)]
 )
 data class NoteEntity(
     var title: String = "",
     var content: String = "",
+    @ColumnInfo(name = "notebook_id", index = true)
+    var notebookId: Long? = null,
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Long? = null
@@ -27,13 +29,10 @@ data class NoteEntity(
     @ColumnInfo(name = "date_created")
     var dateCreated: OffsetDateTime = OffsetDateTime.now(ZoneOffset.UTC)
 
-    @ColumnInfo(index = true)
-    var notebook: Long? = null
-
     fun toNote(): Note {
         return Note(
-            id,
-            title,
+            id = id,
+            title = title,
         )
     }
 }

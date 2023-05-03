@@ -8,7 +8,7 @@ import java.time.OffsetDateTime
     entities = [
         NotebookEntity::class,
         NoteEntity::class],
-    version=1)
+    version=2)
 @TypeConverters(StringConverters::class)
 abstract class AppDatabase: RoomDatabase() {
     abstract val notebooksDao: NotebooksDao

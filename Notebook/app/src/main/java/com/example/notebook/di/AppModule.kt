@@ -5,6 +5,7 @@ import com.example.notebook.data.*
 import com.example.notebook.notebooks.CreateNotebookViewModel
 import com.example.notebook.notebooks.NotebookListViewModel
 import com.example.notebook.notebooks.NotebookLockViewModel
+import com.example.notebook.notes.CreateNoteViewModel
 import com.example.notebook.notes.NoteListViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -54,5 +55,8 @@ val appModule = module {
     }
     viewModel {
         NoteListViewModel(get(), get())
+    }
+    viewModel {
+        CreateNoteViewModel(get(), get())
     }
 }
