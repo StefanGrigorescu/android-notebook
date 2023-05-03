@@ -15,7 +15,7 @@ import com.example.notebook.AppBrand
 import com.example.notebook.navigation.BottomBar
 
 @Composable
-fun Settings(navController: NavHostController) {
+fun SettingsScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             AppBrand("Settings")

@@ -80,7 +80,11 @@ fun AddNotebookButton(navController: NavHostController) {
         },
         content = { Icon(Icons.Filled.Add, contentDescription = addNotebookButtonDescription) },
         modifier = Modifier
-            .padding(16.dp)
+            .padding(PaddingValues(
+                top = 12.dp,
+                bottom = 12.dp,
+                end = 24.dp
+            ))
             .wrapContentSize()
     )
 }

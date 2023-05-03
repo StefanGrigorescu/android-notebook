@@ -9,8 +9,8 @@ import com.example.notebook.notebooks.CreateNotebookScreen
 import com.example.notebook.notebooks.NotebookListScreen
 import com.example.notebook.notebooks.NotebookLockScreen
 import com.example.notebook.notes.CreateNoteScreen
-import com.example.notebook.profile.ProfileDetails
-import com.example.notebook.settings.Settings
+import com.example.notebook.profile.ProfileScreen
+import com.example.notebook.settings.SettingsScreen
 
 @Composable
 fun SetupNavGraph(
@@ -33,9 +33,9 @@ fun SetupNavGraph(
         composable(Screen.CreateNote.route) { CreateNoteScreen(navController = navController) }
 
         // Profile
-        composable(BottomBarScreen.Profile.route) { ProfileDetails(navController = navController) }
+        composable(BottomBarScreen.Profile.route) { ProfileScreen(navController = navController) }
 
         // Settings
-        composable(BottomBarScreen.Settings.route) { Settings(navController = navController) }
+        composable(BottomBarScreen.Settings.route) { SettingsScreen(navController = navController) }
     }
 }
