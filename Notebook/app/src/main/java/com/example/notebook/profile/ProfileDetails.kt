@@ -64,7 +64,7 @@ fun GoogleButton(
     borderColor: Color = Color.LightGray,
     backgroundColor: Color = MaterialTheme.colors.surface,
     progressIndicatorColor: Color = MaterialTheme.colors.primary,
-    onClicked: () -> Unit
+    onClicked: () -> Unit = {}
 ) {
     var clicked by remember { mutableStateOf(false) }
 
