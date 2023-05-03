@@ -41,7 +41,7 @@ fun NoteListScreen(
     ) { padding ->
         LazyColumn(
             contentPadding = padding,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().padding(PaddingValues(bottom = 16.dp)),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
