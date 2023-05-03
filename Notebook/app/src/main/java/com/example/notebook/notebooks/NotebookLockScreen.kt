@@ -18,7 +18,10 @@ import com.example.notebook.navigation.Screen
 import org.koin.androidx.compose.getViewModel
 
 @Composable
-fun NotebookLockScreen(navController: NavHostController) {
+fun NotebookLockScreen(
+    notebookId: Long?,
+    navController: NavHostController
+) {
     val viewModel: NotebookLockViewModel = getViewModel<NotebookLockViewModel>()
     val state: NotebookLockScreenState by viewModel.screenState.collectAsState()
 
