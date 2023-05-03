@@ -11,8 +11,8 @@ import java.time.OffsetDateTime
     version=1)
 @TypeConverters(StringConverters::class)
 abstract class AppDatabase: RoomDatabase() {
-    abstract val notebookDao: NotebooksDao
-    abstract val noteDao: NotesDao
+    abstract val notebooksDao: NotebooksDao
+    abstract val notesDao: NotesDao
 
     companion object {
         private var Instance: AppDatabase? = null

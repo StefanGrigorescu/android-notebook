@@ -16,6 +16,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 sealed class Screen(val route: String, val screenName: String) {
+    // Notebooks
     object NotebookList : Screen(
         route = "notebooks/list",
         screenName = "Notebooks List"
@@ -29,6 +30,14 @@ sealed class Screen(val route: String, val screenName: String) {
         screenName = "Notebook Lock"
     ) {
         fun routeFactory(notebookId: Long?) = "notebooks/$notebookId/locked"
+    }
+
+    // Notes
+    object NoteList : Screen(
+        route = "notebooks/{notebookId}/notes/list",
+        screenName = "Notes List"
+    ) {
+        fun routeFactory(notebookId: Long?) = "notebooks/$notebookId/notes/list"
     }
 }
 

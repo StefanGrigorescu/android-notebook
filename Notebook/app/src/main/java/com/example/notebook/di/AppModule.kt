@@ -1,13 +1,11 @@
 package com.example.notebook.di
 
 import com.example.notebook.api.SampleAPI
-import com.example.notebook.data.AppDatabase
-import com.example.notebook.data.INotebooksRepo
-import com.example.notebook.data.NotebooksDao
-import com.example.notebook.data.NotebooksRepo
+import com.example.notebook.data.*
 import com.example.notebook.notebooks.CreateNotebookViewModel
 import com.example.notebook.notebooks.NotebookListViewModel
 import com.example.notebook.notebooks.NotebookLockViewModel
+import com.example.notebook.notes.NoteListViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -25,25 +23,36 @@ val appModule = module {
     single<AppDatabase> {
         AppDatabase.getInstace(androidContext())
     }
+
+    // Obs: There is also 'factory' is equivalent to Transient - a new instance for every requesting object
+
+    // Notebooks
     single<NotebooksDao> {
         val database = get<AppDatabase>()
-        database.notebookDao
+        database.notebooksDao
     }
     single<INotebooksRepo> {
         NotebooksRepo(get(), get())
     }
-
     viewModel {
         NotebookListViewModel(get())
     }
-
     viewModel {
         CreateNotebookViewModel(get())
     }
-
     viewModel {
         NotebookLockViewModel(get(), get())
     }
 
-    // Obs: There is also 'factory' is equivalent to Transient - a new instance for every requesting object
+    // Notes
+    single<NotesDao> {
+        val database = get<AppDatabase>()
+        database.notesDao
+    }
+    single<INotesRepo> {
+        NotesRepo(get())
+    }
+    viewModel {
+        NoteListViewModel(get())
+    }
 }

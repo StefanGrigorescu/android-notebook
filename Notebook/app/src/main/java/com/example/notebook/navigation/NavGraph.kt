@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.notebook.notes.NoteListScreen
 import com.example.notebook.notebooks.CreateNotebookScreen
 import com.example.notebook.notebooks.NotebookListScreen
 import com.example.notebook.notebooks.NotebookLockScreen
@@ -25,6 +26,7 @@ fun SetupNavGraph(
             requireNotNull(notebookId) { "NavigationError: notebookId parameter not found." }
             NotebookLockScreen(navController = navController, notebookId = notebookId)
         }
+        composable(Screen.NoteList.route) { NoteListScreen(navController = navController) }
         composable(BottomBarScreen.Profile.route) { ProfileDetails(navController = navController) }
         composable(BottomBarScreen.Settings.route) { Settings(navController = navController) }
     }

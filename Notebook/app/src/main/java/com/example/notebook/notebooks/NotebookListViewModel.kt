@@ -17,10 +17,10 @@ class NotebookListViewModel(
     private val _notebooksState = _sortByState
         .flatMapLatest { sortBy -> repo.getNotebookEntities(sortBy, _searchTextState.value) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-    val screenState = combine(_screenState, _sortByState, _searchTextState, _notebooksState) { state, notebooksSortBy, notebooksSearchText, notebooks ->
+    val screenState = combine(_screenState, _sortByState, _searchTextState, _notebooksState) { state, sortBy, searchText, notebooks ->
         state.copy(
-            sortBy = notebooksSortBy,
-            searchText = notebooksSearchText,
+            sortBy = sortBy,
+            searchText = searchText,
             notebooks = notebooks
                 .map { entity -> entity.toNotebook() },
         )
@@ -68,7 +68,5 @@ enum class NotebooksSortBy {
 data class NotebookListScreenState(
     val notebooks: List<Notebook> = emptyList(),
     val sortBy: NotebooksSortBy = NotebooksSortBy.DateCreatedAsc,
-    val searchText: String = "",
-
-    var inputCurrentPassword: String = ""
+    val searchText: String = ""
 )

@@ -1,4 +1,4 @@
-package com.example.notebook.notebooks
+package com.example.notebook.notes
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -11,8 +11,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -22,18 +24,18 @@ import com.example.notebook.navigation.Screen
 import org.koin.androidx.compose.getViewModel
 
 @Composable
-fun NotebookListScreen(
+fun NoteListScreen(
     navController: NavHostController
 ) {
-    val viewModel: NotebookListViewModel = getViewModel<NotebookListViewModel>()
-    val notebooksState: NotebookListScreenState by viewModel.screenState.collectAsState()
+    val viewModel: NoteListViewModel = getViewModel<NoteListViewModel>()
+    val notesState: NoteListScreenState by viewModel.screenState.collectAsState()
 
     Scaffold(
         topBar = {
-            AppBrand(Screen.NotebookList.screenName)
+            AppBrand(Screen.NoteList.screenName)
         },
         bottomBar = { BottomBar(navController = navController) },
-        floatingActionButton = { AddNotebookButton(navController) },
+        floatingActionButton = { AddNoteButton(navController) },
         floatingActionButtonPosition = FabPosition.End
     ) { padding ->
         LazyColumn(
@@ -42,28 +44,28 @@ fun NotebookListScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                NotebookSearchView(notebooksState.searchText) { event ->
+                NoteSearchView(notesState.searchText) { event ->
                     viewModel.onEvent(event)
                 }
             }
             item {
-                NotebookSortView(notebooksState) { event ->
+                NoteSortView(notesState) { event ->
                     viewModel.onEvent(event)
                 }
             }
-            if (notebooksState.notebooks.isEmpty()) {
-                val noNotebooksYet = "There is no notebook created yet. Try creating one!"
+            if (notesState.notes.isEmpty()) {
+                val noNotesYet = "There is no note created in this notebook yet. Try creating one!"
 
                 item {
                     Text(
-                        text = noNotebooksYet,
+                        text = noNotesYet,
                         style = MaterialTheme.typography.h5,
                         modifier = Modifier.padding(PaddingValues(start = 20.dp, top=8.dp))
                     )
                 }
             } else {
-                items(items = notebooksState.notebooks) { notebook ->
-                    NotebookListItem(notebook, navController)
+                items(items = notesState.notes) { note ->
+                    NoteListItem(note, navController)
                 }
             }
         }
@@ -71,14 +73,15 @@ fun NotebookListScreen(
 }
 
 @Composable
-fun AddNotebookButton(navController: NavHostController) {
-    val addNotebookButtonDescription = "Add a new notebook"
+fun AddNoteButton(navController: NavHostController) {
+    val addNoteButtonDescription = "Add a new note"
 
     FloatingActionButton(
         onClick = {
-            navController.navigate(Screen.CreateNotebook.route)
+            // TODO: Uncomment the following line after adding the new screen and registering it in the screens enum
+            // navController.navigate(Screen.CreateNote.route)
         },
-        content = { Icon(Icons.Filled.Add, contentDescription = addNotebookButtonDescription) },
+        content = { Icon(Icons.Filled.Add, contentDescription = addNoteButtonDescription) },
         modifier = Modifier
             .padding(16.dp)
             .wrapContentSize()
@@ -86,46 +89,46 @@ fun AddNotebookButton(navController: NavHostController) {
 }
 
 @Composable
-fun NotebookSearchView(
+fun NoteSearchView(
     stateSearchText: String,
-    onSearchNotebooks: (NotebooksEvent.SearchNotebookEvent) -> Unit
+    onSearchNotes: (NotesEvent.SearchNoteEvent) -> Unit
 ) {
-    val searchNotebookHint = "Search notebook by name or by description"
+    val searchNoteHint = "Search note by name"
 
     TextField(
         value = stateSearchText,
         onValueChange = { newSearchText: String ->
-            onSearchNotebooks(NotebooksEvent.SearchNotebookEvent(newSearchText))
+            onSearchNotes(NotesEvent.SearchNoteEvent(newSearchText))
         },
-        label = { Text(searchNotebookHint) },
+        label = { Text(searchNoteHint) },
         leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
         modifier = Modifier.fillMaxWidth()
     )
 }
 
 @Composable
-fun NotebookSortView(
-    notebooksState: NotebookListScreenState,
-    onSortNotebooks: (NotebooksEvent.SortNotebooksEvent) -> Unit
+fun NoteSortView(
+    notesState: NoteListScreenState,
+    onSortNotes: (NotesEvent.SortNotesEvent) -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState()),
-        verticalAlignment = CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        NotebooksSortBy.values().forEach { sortBy ->
+        NotesSortBy.values().forEach { sortBy ->
             Row(
                 modifier = Modifier
                     .clickable {
-                        onSortNotebooks(NotebooksEvent.SortNotebooksEvent(sortBy))
+                        onSortNotes(NotesEvent.SortNotesEvent(sortBy))
                     },
-                verticalAlignment = CenterVertically
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
-                    selected = notebooksState.sortBy == sortBy,
+                    selected = notesState.sortBy == sortBy,
                     onClick = {
-                        onSortNotebooks(NotebooksEvent.SortNotebooksEvent(sortBy))
+                        onSortNotes(NotesEvent.SortNotesEvent(sortBy))
                     })
                 Text(text = sortBy.toString())
             }
@@ -134,8 +137,8 @@ fun NotebookSortView(
 }
 
 @Composable
-fun NotebookListItem(
-    notebook: Notebook,
+fun NoteListItem(
+    note: Note,
     navController: NavHostController
 ) {
     Row(
@@ -146,21 +149,15 @@ fun NotebookListItem(
                 .padding(PaddingValues(start = 20.dp, ))
                 .weight(1f)
                 .clickable(onClick = {
-                    if(notebook.hasPassword) {
-                        navController.navigate(Screen.NotebookLock.routeFactory(notebook.id))
-                    } else {
-                        navController.navigate(Screen.NoteList.routeFactory(notebook.id))
+                        // TODO: Uncomment the following line after adding the new screen and registering it in the screens enum
+                        // navController.navigate(Screen.NoteScreen.route)
                     }
-                }),
+                ),
         ) {
             Text(
-                text = notebook.title,
+                text = note.title,
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                text = notebook.description,
-                style = MaterialTheme.typography.body1
             )
         }
         IconButton(
